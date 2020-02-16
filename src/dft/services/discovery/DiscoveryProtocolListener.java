@@ -54,12 +54,24 @@ public class DiscoveryProtocolListener {
                 DatagramPacket receivePacket = receiveRequest();
                 InetAddress senderAddress = receivePacket.getAddress();
                 int senderPort = receivePacket.getPort();
+                String receivedMessage = new String(receivePacket.getData(),
+                        receivePacket.getOffset(),
+                        receivePacket.getLength());
 
-                if (callback != null) {
-                    this.notifyRequestReceivedIfNotEqualsCurrentDeviceAddress(senderAddress, senderPort);
+                if (receivedIpIsCurrentDeviceIp(senderAddress)) {
+                    continue;
                 }
 
-                sendResponse(senderAddress, senderPort);
+                if (isDiscoveryMessage(receivedMessage)) {
+                    if (callback != null) {
+                        callback.discoveryRequestReceived(senderAddress, senderPort);
+                    }
+                    sendResponse(senderAddress, senderPort);
+                } else {
+                    if (callback != null) {
+                        notifyDiscoveryResponse(senderAddress, senderPort, receivedMessage);
+                    }
+                }
             } catch (IOException ignored) {
                 listening.set(false);
             }
@@ -71,12 +83,6 @@ public class DiscoveryProtocolListener {
         DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
         this.serverSocket.receive(receivePacket);
         return receivePacket;
-    }
-
-    private void notifyRequestReceivedIfNotEqualsCurrentDeviceAddress(InetAddress address, int port) {
-        if (!this.receivedIpIsCurrentDeviceIp(address)) {
-            callback.discoveryRequestReceived(address, port);
-        }
     }
 
     private void sendResponse(InetAddress address, int port) throws IOException {
@@ -97,7 +103,23 @@ public class DiscoveryProtocolListener {
         return false;
     }
 
+    private boolean isDiscoveryMessage(String message) {
+        return message.equals("discovery");
+    }
+
+    private void notifyDiscoveryResponse(InetAddress address, int port, String message) {
+        try {
+            DeviceProperties deviceProperties = new Gson()
+                    .fromJson(message, DeviceProperties.class);
+            callback.discoveryResponseReceived(address, port, deviceProperties);
+        } catch (Exception e) {
+            System.err.println("Protocol message error: " + e.getMessage());
+        }
+    }
+
     public interface Callback {
         void discoveryRequestReceived(InetAddress senderAddress, int senderPort);
+
+        void discoveryResponseReceived(InetAddress senderAddress, int senderPort, DeviceProperties deviceProperties);
     }
 }

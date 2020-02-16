@@ -1,7 +1,9 @@
 package dft.view;
 
+import dft.model.DeviceProperties;
 import dft.services.discovery.*;
 
+import java.net.InetAddress;
 import java.net.SocketException;
 
 public class MainPresenter implements MainContract.Presenter {
@@ -17,8 +19,17 @@ public class MainPresenter implements MainContract.Presenter {
     @Override
     public void onViewLoaded() {
         discoveryListener = DiscoveryProtocolListenerFactory
-                .getDefault(DISCOVERY_SERVICE_PORT, (senderAddress, senderPort)
-                        -> System.out.println(senderAddress.getHostAddress()));
+                .getDefault(DISCOVERY_SERVICE_PORT, new DiscoveryProtocolListener.Callback() {
+                    @Override
+                    public void discoveryRequestReceived(InetAddress senderAddress, int senderPort) {
+                        System.out.println("Received request from: " + senderAddress.getHostAddress());
+                    }
+
+                    @Override
+                    public void discoveryResponseReceived(InetAddress senderAddress, int senderPort, DeviceProperties deviceProperties) {
+                        System.out.println("Received response: " + senderAddress.getHostAddress() + " - " + deviceProperties.getName() + ", " + deviceProperties.getOs());
+                    }
+                });
         try {
             discoveryListener.start();
         } catch (SocketException e) {
