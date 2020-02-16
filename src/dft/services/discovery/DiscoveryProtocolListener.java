@@ -66,7 +66,7 @@ public class DiscoveryProtocolListener {
                     if (callback != null) {
                         callback.discoveryRequestReceived(senderAddress, senderPort);
                     }
-                    sendResponse(senderAddress, senderPort);
+                    sendResponse(senderAddress);
                 } else {
                     if (callback != null) {
                         notifyDiscoveryResponse(senderAddress, senderPort, receivedMessage);
@@ -85,9 +85,9 @@ public class DiscoveryProtocolListener {
         return receivePacket;
     }
 
-    private void sendResponse(InetAddress address, int port) throws IOException {
+    private void sendResponse(InetAddress senderAddress) throws IOException {
         byte[] sendData = devicePropertiesJson.getBytes();
-        DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, address, port);
+        DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, senderAddress, port);
         serverSocket.send(sendPacket);
     }
 
@@ -107,11 +107,11 @@ public class DiscoveryProtocolListener {
         return message.equals("discovery");
     }
 
-    private void notifyDiscoveryResponse(InetAddress address, int port, String message) {
+    private void notifyDiscoveryResponse(InetAddress senderAddress, int senderPort, String message) {
         try {
             DeviceProperties deviceProperties = new Gson()
                     .fromJson(message, DeviceProperties.class);
-            callback.discoveryResponseReceived(address, port, deviceProperties);
+            callback.discoveryResponseReceived(senderAddress, senderPort, deviceProperties);
         } catch (Exception e) {
             System.err.println("Protocol message error: " + e.getMessage());
         }

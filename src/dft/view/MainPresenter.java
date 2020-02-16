@@ -33,7 +33,7 @@ public class MainPresenter implements MainContract.Presenter {
         try {
             discoveryListener.start();
         } catch (SocketException e) {
-            this.view.showError("Init error", e.getMessage());
+            this.view.showError("Initialization error", e.getMessage());
             this.view.close();
         }
         discoverySender = DiscoveryProtocolSenderFactory.getDefault(DISCOVERY_SERVICE_PORT);
