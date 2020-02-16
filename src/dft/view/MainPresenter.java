@@ -1,5 +1,6 @@
 package dft.view;
 
+import dft.model.Device;
 import dft.model.DeviceProperties;
 import dft.services.discovery.*;
 
@@ -28,6 +29,10 @@ public class MainPresenter implements MainContract.Presenter {
                     @Override
                     public void discoveryResponseReceived(InetAddress senderAddress, int senderPort, DeviceProperties deviceProperties) {
                         System.out.println("Received response: " + senderAddress.getHostAddress() + " - " + deviceProperties.getName() + ", " + deviceProperties.getOs());
+                        String deviceName = deviceProperties.getName();
+                        String os = deviceProperties.getOs();
+                        String ipAddress = senderAddress.getHostAddress();
+                        view.addDevice(new Device(deviceName, os, ipAddress));
                     }
                 });
         try {
@@ -43,6 +48,7 @@ public class MainPresenter implements MainContract.Presenter {
     public void onDiscoverDevicesButtonClicked() {
         try {
             discoverySender.discover();
+            view.clearDevicesList();
         } catch (SocketException e) {
             this.view.showError("Discover error", e.getMessage());
         }
