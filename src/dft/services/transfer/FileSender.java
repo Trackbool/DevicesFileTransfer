@@ -26,7 +26,7 @@ public class FileSender {
         return (int) ((sentCount.get() * 100) / file.length());
     }
 
-    public void send(FileOutputStream outputStream) {
+    public void send(OutputStream outputStream) {
         if (sending.get()) throw new IllegalStateException("Already sending the file");
 
         sending.set(true);
