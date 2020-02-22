@@ -3,13 +3,14 @@ package dft.services.transfer;
 import java.io.*;
 import java.util.Date;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicLong;
 
 public class FileReceiver {
     private final static int BUFFER_SIZE = 8192;
     private final Callback callback;
     private final AtomicBoolean receiving;
-    private long fileSize;
-    private long receivedCount;
+    private AtomicLong fileSize;
+    private AtomicLong receivedCount;
 
     public FileReceiver(Callback callback) {
         this.callback = callback;
@@ -21,7 +22,7 @@ public class FileReceiver {
     }
 
     public int getReceivedPercentage() {
-        return (int) ((receivedCount * 100) / fileSize);
+        return (int) ((receivedCount.get() * 100) / fileSize.get());
     }
 
     public void receiveFile(FileInputStream inputStream) {
@@ -32,7 +33,7 @@ public class FileReceiver {
         String fileName;
         try {
             fileName = input.readUTF();
-            fileSize = input.readLong();
+            fileSize.set(input.readLong());
         } catch (IOException e) {
             receiving.set(false);
             callback.onFailure(e);
@@ -41,12 +42,12 @@ public class FileReceiver {
 
         try (BufferedOutputStream fileWriter = new BufferedOutputStream(new FileOutputStream(fileName))) {
             byte[] buffer = new byte[BUFFER_SIZE];
-            receivedCount = 0;
+            receivedCount.set(0);
             int received;
             while ((received = input.read(buffer)) != -1) {
                 if (!receiving.get()) return;
                 fileWriter.write(buffer);
-                receivedCount += received;
+                receivedCount.getAndAdd(received);
             }
             callback.onSuccess(new File(fileName));
         } catch (IOException e) {
