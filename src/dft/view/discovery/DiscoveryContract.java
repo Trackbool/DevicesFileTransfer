@@ -1,8 +1,8 @@
-package dft.view;
+package dft.view.discovery;
 
 import dft.model.Device;
 
-public interface MainContract {
+public interface DiscoveryContract {
     interface View {
         void addDevice(Device device);
 

@@ -1,4 +1,4 @@
-package dft.view;
+package dft.view.discovery;
 
 import dft.model.Device;
 import dft.model.DeviceProperties;
@@ -7,13 +7,13 @@ import dft.services.discovery.*;
 import java.net.InetAddress;
 import java.net.SocketException;
 
-public class MainPresenter implements MainContract.Presenter {
+public class DiscoveryPresenter implements DiscoveryContract.Presenter {
     private final static int DISCOVERY_SERVICE_PORT = 5000;
-    private MainContract.View view;
+    private DiscoveryContract.View view;
     private DiscoveryProtocolListener discoveryListener;
     private DiscoveryProtocolSender discoverySender;
 
-    public MainPresenter(MainContract.View view) {
+    public DiscoveryPresenter(DiscoveryContract.View view) {
         this.view = view;
     }
 
@@ -31,8 +31,7 @@ public class MainPresenter implements MainContract.Presenter {
                         System.out.println("Received response: " + senderAddress.getHostAddress() + " - " + deviceProperties.getName() + ", " + deviceProperties.getOs());
                         String deviceName = deviceProperties.getName();
                         String os = deviceProperties.getOs();
-                        String ipAddress = senderAddress.getHostAddress();
-                        view.addDevice(new Device(deviceName, os, ipAddress));
+                        view.addDevice(new Device(deviceName, os, senderAddress));
                     }
                 });
         try {
@@ -42,10 +41,15 @@ public class MainPresenter implements MainContract.Presenter {
             this.view.close();
         }
         discoverySender = DiscoveryProtocolSenderFactory.getDefault(DISCOVERY_SERVICE_PORT);
+        this.discoverDevices();
     }
 
     @Override
     public void onDiscoverDevicesButtonClicked() {
+        this.discoverDevices();
+    }
+
+    private void discoverDevices() {
         try {
             discoverySender.discover();
             view.clearDevicesList();

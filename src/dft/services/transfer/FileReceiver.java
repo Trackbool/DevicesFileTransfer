@@ -1,22 +1,29 @@
 package dft.services.transfer;
 
 import java.io.*;
-import java.util.Date;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 
 public class FileReceiver {
     private final static int BUFFER_SIZE = 8192;
-    private final Callback callback;
+    private Callback callback;
     private final AtomicBoolean receiving;
     private AtomicLong fileSize;
     private AtomicLong receivedCount;
 
-    public FileReceiver(Callback callback) {
-        this.callback = callback;
+    public FileReceiver() {
         this.receiving = new AtomicBoolean(false);
-        this.fileSize = new AtomicLong();
-        this.receivedCount = new AtomicLong();
+        this.fileSize = new AtomicLong(0);
+        this.receivedCount = new AtomicLong(0);
+    }
+
+    public FileReceiver(Callback callback) {
+        this();
+        this.callback = callback;
+    }
+
+    public void setCallback(Callback callback) {
+        this.callback = callback;
     }
 
     public boolean isReceiving() {
@@ -27,7 +34,7 @@ public class FileReceiver {
         return (int) ((receivedCount.get() * 100) / fileSize.get());
     }
 
-    public void receiveFile(InputStream inputStream) {
+    public void receive(InputStream inputStream) {
         if (receiving.get()) throw new IllegalStateException("Already receiving the file");
 
         DataInputStream input = new DataInputStream(inputStream);
@@ -38,7 +45,8 @@ public class FileReceiver {
             fileSize.set(input.readLong());
         } catch (IOException e) {
             receiving.set(false);
-            callback.onFailure(e);
+            if (callback != null)
+                callback.onFailure(e);
             return;
         }
 
@@ -47,14 +55,18 @@ public class FileReceiver {
             receivedCount.set(0);
             int received;
             while ((received = input.read(buffer)) != -1) {
-                if (!receiving.get()) return;
+                if (!receiving.get() || Thread.interrupted()) return;
                 fileWriter.write(buffer);
                 receivedCount.getAndAdd(received);
+                if (callback != null)
+                    callback.onProgressUpdated();
             }
-            callback.onSuccess(new File(fileName));
+            if (callback != null)
+                callback.onSuccess(new File(fileName));
         } catch (IOException e) {
             receiving.set(false);
-            callback.onFailure(e);
+            if (callback != null)
+                callback.onFailure(e);
         } finally {
             receiving.set(false);
             try {
@@ -70,6 +82,8 @@ public class FileReceiver {
 
     public interface Callback {
         void onFailure(Exception e);
+
+        void onProgressUpdated();
 
         void onSuccess(File file);
     }

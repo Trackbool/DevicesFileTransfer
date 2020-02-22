@@ -11,11 +11,19 @@ public class FileSender {
     private final AtomicBoolean sending;
     private AtomicLong sentCount;
 
-    public FileSender(File file, Callback callback) {
+    public FileSender(File file) {
         this.file = file;
         this.sending = new AtomicBoolean(false);
+        this.sentCount = new AtomicLong(0);
+    }
+
+    public FileSender(File file, Callback callback) {
+        this(file);
         this.callback = callback;
-        this.sentCount = new AtomicLong();
+    }
+
+    public void setCallback(Callback callback){
+        this.callback = callback;
     }
 
     public boolean isSending() {
@@ -39,14 +47,18 @@ public class FileSender {
             sentCount.set(0);
             int sent;
             while ((sent = fileReader.read(buffer)) != -1) {
-                if (!sending.get()) return;
+                if (!sending.get() || Thread.interrupted()) return;
                 output.write(buffer);
                 sentCount.getAndAdd(sent);
+                if (callback != null)
+                    callback.onProgressUpdated();
             }
-            callback.onSuccess(file);
+            if (callback != null)
+                callback.onSuccess(file);
         } catch (IOException e) {
             sending.set(false);
-            callback.onFailure(e);
+            if (callback != null)
+                callback.onFailure(e);
         } finally {
             sending.set(false);
         }
@@ -58,6 +70,8 @@ public class FileSender {
 
     public interface Callback {
         void onFailure(IOException e);
+
+        void onProgressUpdated();
 
         void onSuccess(File file);
     }

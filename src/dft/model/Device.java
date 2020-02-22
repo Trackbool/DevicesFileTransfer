@@ -1,14 +1,16 @@
 package dft.model;
 
+import java.net.InetAddress;
+
 public class Device {
     private String name;
     private String os;
-    private String ipAddress;
+    private InetAddress address;
 
-    public Device(String name, String os, String ipAddress) {
+    public Device(String name, String os, InetAddress address) {
         this.name = name;
         this.os = os;
-        this.ipAddress = ipAddress;
+        this.address = address;
     }
 
     public String getName() {
@@ -19,7 +21,11 @@ public class Device {
         return os;
     }
 
+    public InetAddress getAddress() {
+        return address;
+    }
+
     public String getIpAddress() {
-        return ipAddress;
+        return address.getHostAddress();
     }
 }
