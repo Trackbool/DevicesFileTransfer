@@ -27,7 +27,7 @@ public class FileReceiver {
         return (int) ((receivedCount.get() * 100) / fileSize.get());
     }
 
-    public void receiveFile(FileInputStream inputStream) {
+    public void receiveFile(InputStream inputStream) {
         if (receiving.get()) throw new IllegalStateException("Already receiving the file");
 
         DataInputStream input = new DataInputStream(inputStream);
