@@ -34,6 +34,7 @@ public class FileReceiver {
             fileName = input.readUTF();
             fileSize = input.readLong();
         } catch (IOException e) {
+            receiving.set(false);
             callback.onFailure(e);
             return;
         }
@@ -49,6 +50,7 @@ public class FileReceiver {
             }
             callback.onSuccess(new File(fileName));
         } catch (IOException e) {
+            receiving.set(false);
             callback.onFailure(e);
         } finally {
             receiving.set(false);

@@ -43,6 +43,7 @@ public class FileSender {
             }
             callback.onSuccess(file);
         } catch (IOException e) {
+            sending.set(false);
             callback.onFailure(e);
         } finally {
             sending.set(false);
