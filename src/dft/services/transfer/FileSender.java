@@ -9,7 +9,7 @@ import java.net.Socket;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class FileSender {
-    private final static int BUFFER_SIZE = 512000;
+    private final static int BUFFER_SIZE = 8192;
     private final File file;
     private final int port;
     private Callback callback;

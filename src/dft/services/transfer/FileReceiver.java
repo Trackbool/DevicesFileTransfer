@@ -3,7 +3,7 @@ package dft.services.transfer;
 import java.io.*;
 
 public class FileReceiver {
-    private final static int BUFFER_SIZE = 512000;
+    private final static int BUFFER_SIZE = 8192;
     private final File dstFile;
     private final Callback callback;
 
