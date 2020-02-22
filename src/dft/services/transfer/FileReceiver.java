@@ -15,6 +15,8 @@ public class FileReceiver {
     public FileReceiver(Callback callback) {
         this.callback = callback;
         this.receiving = new AtomicBoolean(false);
+        this.fileSize = new AtomicLong();
+        this.receivedCount = new AtomicLong();
     }
 
     public boolean isReceiving() {

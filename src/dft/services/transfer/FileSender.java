@@ -13,9 +13,9 @@ public class FileSender {
 
     public FileSender(File file, Callback callback) {
         this.file = file;
-        sending = new AtomicBoolean(false);
+        this.sending = new AtomicBoolean(false);
         this.callback = callback;
-        sentCount = new AtomicLong();
+        this.sentCount = new AtomicLong();
     }
 
     public boolean isSending() {
