@@ -73,7 +73,6 @@ public class DiscoveryProtocolListener {
                     }
                 }
             } catch (IOException ignored) {
-                listening.set(false);
             }
         }
     }
