@@ -1,28 +1,18 @@
 package dft.services.transfer;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.net.InetAddress;
-import java.net.Socket;
+import java.io.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class FileSender {
     private final static int BUFFER_SIZE = 8192;
     private final File file;
-    private final int port;
     private Callback callback;
     private final AtomicBoolean sending;
+    private long sentCount;
 
-    public FileSender(File file, int port) {
+    public FileSender(File file, Callback callback) {
         this.file = file;
-        this.port = port;
         sending = new AtomicBoolean(false);
-    }
-
-    public FileSender(File file, int port, Callback callback) {
-        this(file, port);
         this.callback = callback;
     }
 
@@ -30,18 +20,28 @@ public class FileSender {
         return sending.get();
     }
 
-    public void send(InetAddress address) {
-        try (FileInputStream fileReader = new FileInputStream(file);
-             Socket socket = new Socket(address, port);
-             OutputStream out = socket.getOutputStream()) {
+    public int getSentPercentage() {
+        return (int) ((sentCount * 100) / file.length());
+    }
 
+    public void send(FileOutputStream outputStream) {
+        if (sending.get()) throw new IllegalArgumentException("Already sending the file");
+
+        try (FileInputStream fileReader = new FileInputStream(file);
+             DataOutputStream output = new DataOutputStream(outputStream)) {
             sending.set(true);
+            output.writeUTF(file.getName());
+            output.writeLong(file.length());
+
             byte[] buffer = new byte[BUFFER_SIZE];
-            while (fileReader.read() != -1) {
+            sentCount = 0;
+            int sent;
+            while ((sent = fileReader.read(buffer)) != -1) {
                 if (!sending.get()) return;
-                out.write(buffer);
+                output.write(buffer);
+                sentCount += sent;
             }
-            callback.onSuccess();
+            callback.onSuccess(file);
         } catch (IOException e) {
             callback.onFailure(e);
         } finally {
@@ -56,6 +56,6 @@ public class FileSender {
     public interface Callback {
         void onFailure(IOException e);
 
-        void onSuccess();
+        void onSuccess(File file);
     }
 }
