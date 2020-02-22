@@ -17,19 +17,21 @@ public class TransferPresenter implements TransferContract.Presenter {
     private TransferContract.View view;
     private FilesReceiverListener filesReceiverListener;
     private ThreadPoolExecutor fileSendingExecutor;
+    private ThreadPoolExecutor fileReceivingExecutor;
 
     private File fileToSend;
 
     public TransferPresenter(TransferContract.View view) {
         this.view = view;
         this.fileSendingExecutor = (ThreadPoolExecutor) Executors.newFixedThreadPool(10);
+        this.fileReceivingExecutor = (ThreadPoolExecutor) Executors.newFixedThreadPool(10);
     }
 
     @Override
     public void onViewLoaded() {
         filesReceiverListener = new FilesReceiverListener(TRANSFER_SERVICE_PORT, inputStream -> {
             FileReceiver fileReceiver = this.createFileReceiver();
-            fileReceiver.receive(inputStream);
+            fileReceivingExecutor.execute(() -> fileReceiver.receive(inputStream));
         });
 
         new Thread(() -> {
@@ -131,5 +133,6 @@ public class TransferPresenter implements TransferContract.Presenter {
         fileToSend = null;
         filesReceiverListener.stop();
         fileSendingExecutor.shutdownNow();
+        fileReceivingExecutor.shutdownNow();
     }
 }
