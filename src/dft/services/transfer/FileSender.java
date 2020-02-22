@@ -26,25 +26,27 @@ public class FileSender {
         this.callback = callback;
     }
 
-    public void send(InetAddress address) {
-        sending.set(true);
-        new Thread(() -> {
-            try (FileInputStream fileReader = new FileInputStream(file);
-                 Socket socket = new Socket(address, port);
-                 OutputStream out = socket.getOutputStream()) {
+    public boolean isSending() {
+        return sending.get();
+    }
 
-                byte[] buffer = new byte[BUFFER_SIZE];
-                while (fileReader.read() != -1) {
-                    if (!sending.get()) return;
-                    out.write(buffer);
-                }
-                callback.onSuccess();
-            } catch (IOException e) {
-                callback.onFailure(e);
-            } finally {
-                sending.set(false);
+    public void send(InetAddress address) {
+        try (FileInputStream fileReader = new FileInputStream(file);
+             Socket socket = new Socket(address, port);
+             OutputStream out = socket.getOutputStream()) {
+
+            sending.set(true);
+            byte[] buffer = new byte[BUFFER_SIZE];
+            while (fileReader.read() != -1) {
+                if (!sending.get()) return;
+                out.write(buffer);
             }
-        }).start();
+            callback.onSuccess();
+        } catch (IOException e) {
+            callback.onFailure(e);
+        } finally {
+            sending.set(false);
+        }
     }
 
     public void cancel() {
