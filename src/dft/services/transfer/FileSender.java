@@ -25,7 +25,7 @@ public class FileSender {
     }
 
     public void send(FileOutputStream outputStream) {
-        if (sending.get()) throw new IllegalArgumentException("Already sending the file");
+        if (sending.get()) throw new IllegalStateException("Already sending the file");
 
         try (FileInputStream fileReader = new FileInputStream(file);
              DataOutputStream output = new DataOutputStream(outputStream)) {
