@@ -62,7 +62,7 @@ public class FileReceiver {
                     callback.onProgressUpdated();
             }
             if (callback != null) {
-                if(getReceivedPercentage() == 100) {
+                if (receivedCount.get() == fileSize.get()) {
                     callback.onSuccess(new File(fileName));
                 } else {
                     callback.onFailure(new Exception("The file has not been completely transferred"));

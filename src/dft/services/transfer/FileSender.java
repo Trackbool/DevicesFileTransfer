@@ -22,7 +22,7 @@ public class FileSender {
         this.callback = callback;
     }
 
-    public void setCallback(Callback callback){
+    public void setCallback(Callback callback) {
         this.callback = callback;
     }
 
@@ -54,7 +54,7 @@ public class FileSender {
                     callback.onProgressUpdated();
             }
             if (callback != null) {
-                if(getSentPercentage() == 100) {
+                if (sentCount.get() == file.length()) {
                     callback.onSuccess(file);
                 } else {
                     callback.onFailure(new Exception("The file has not been completely transferred"));
