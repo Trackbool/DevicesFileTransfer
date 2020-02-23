@@ -54,9 +54,9 @@ public class FileReceiver {
             byte[] buffer = new byte[BUFFER_SIZE];
             receivedCount.set(0);
             int received;
-            while ((received = input.read(buffer)) != -1) {
+            while ((received = input.read(buffer, 0, buffer.length)) != -1) {
                 if (!receiving.get() || Thread.interrupted()) return;
-                fileWriter.write(buffer);
+                fileWriter.write(buffer, 0, received);
                 receivedCount.getAndAdd(received);
                 if (callback != null)
                     callback.onProgressUpdated();

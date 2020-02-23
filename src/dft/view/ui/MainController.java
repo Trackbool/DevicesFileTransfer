@@ -88,9 +88,8 @@ public class MainController implements Initializable, DiscoveryContract.View, Tr
 
     @Override
     public void browseFile() {
-        String filePath = WindowUtils.browseFile();
-        if (filePath != null) {
-            File file = new File(filePath);
+        File file = WindowUtils.browseFile();
+        if (file != null) {
             transferPresenter.onFileAttached(file);
         }
     }

@@ -46,9 +46,9 @@ public class FileSender {
             byte[] buffer = new byte[BUFFER_SIZE];
             sentCount.set(0);
             int sent;
-            while ((sent = fileReader.read(buffer)) != -1) {
+            while ((sent = fileReader.read(buffer, 0, buffer.length)) != -1) {
                 if (!sending.get() || Thread.interrupted()) return;
-                output.write(buffer);
+                output.write(buffer, 0, sent);
                 sentCount.getAndAdd(sent);
                 if (callback != null)
                     callback.onProgressUpdated();
