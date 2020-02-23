@@ -24,7 +24,6 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
-import java.util.stream.Collectors;
 
 public class MainController implements Initializable, DiscoveryContract.View, TransferContract.View {
     private ObservableList<Device> devices;
@@ -78,12 +77,12 @@ public class MainController implements Initializable, DiscoveryContract.View, Tr
 
     @Override
     public void showError(String title, String message) {
-        AlertUtils.showError(title, message);
+        runOnUiThread(() -> AlertUtils.showError(title, message));
     }
 
     @Override
     public void showAlert(String title, String message) {
-        AlertUtils.showMessage(title, message);
+        runOnUiThread(() -> AlertUtils.showMessage(title, message));
     }
 
     @Override
@@ -125,5 +124,9 @@ public class MainController implements Initializable, DiscoveryContract.View, Tr
     private void onQuit() {
         this.discoveryPresenter.onDestroy();
         this.transferPresenter.onDestroy();
+    }
+
+    private void runOnUiThread(Runnable runnable) {
+        Platform.runLater(runnable);
     }
 }
