@@ -88,7 +88,7 @@ public class TransferPresenter implements TransferContract.Presenter {
         fileReceiver.setCallback(new FileReceiver.Callback() {
             @Override
             public void onFailure(Exception e) {
-                System.out.println("Error receiving: " + e.getMessage());
+                view.showError("Receiving error", e.getMessage());
             }
 
             @Override
@@ -109,7 +109,7 @@ public class TransferPresenter implements TransferContract.Presenter {
         FileSender fileSender = new FileSender(file);
         fileSender.setCallback(new FileSender.Callback() {
             @Override
-            public void onFailure(IOException e) {
+            public void onFailure(Exception e) {
                 view.showError("Sending error", e.getMessage());
             }
 

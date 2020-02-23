@@ -53,8 +53,13 @@ public class FileSender {
                 if (callback != null)
                     callback.onProgressUpdated();
             }
-            if (callback != null)
-                callback.onSuccess(file);
+            if (callback != null) {
+                if(getSentPercentage() == 100) {
+                    callback.onSuccess(file);
+                } else {
+                    callback.onFailure(new Exception("The file has not been completely transferred"));
+                }
+            }
         } catch (IOException e) {
             sending.set(false);
             if (callback != null)
@@ -69,7 +74,7 @@ public class FileSender {
     }
 
     public interface Callback {
-        void onFailure(IOException e);
+        void onFailure(Exception e);
 
         void onProgressUpdated();
 
