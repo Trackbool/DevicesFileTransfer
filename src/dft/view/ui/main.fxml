@@ -68,8 +68,9 @@
                   <TableView fx:id="sendingTableView" prefWidth="440.0">
                     <columns>
                       <TableColumn fx:id="sendingDeviceNameColumn" prefWidth="140.0" resizable="false" text="Device Name" />
-                      <TableColumn fx:id="sendingIpAddressColumn" prefWidth="215.0" resizable="false" text="IP Address" />
-                      <TableColumn fx:id="sendingStatusColumn" prefWidth="83.0" resizable="false" text="Status" />
+                      <TableColumn fx:id="sendingIpAddressColumn" prefWidth="131.0" resizable="false" text="IP Address" />
+                      <TableColumn fx:id="sendingFileNameColumn" prefWidth="116.0" resizable="false" text="File" />
+                      <TableColumn fx:id="sendingStatusColumn" prefWidth="51.0" resizable="false" text="Status" />
                     </columns>
                   </TableView>
                </children>
@@ -84,8 +85,9 @@
                   <TableView fx:id="receptionsTableView" prefWidth="440.0">
                      <columns>
                         <TableColumn fx:id="receptionsDeviceNameColumn" prefWidth="140.0" resizable="false" text="Device Name" />
-                        <TableColumn fx:id="receptionsIpAddressColumn" prefWidth="215.0" resizable="false" text="IP Address" />
-                        <TableColumn fx:id="receptionsStatus" prefWidth="83.0" resizable="false" text="Status" />
+                        <TableColumn fx:id="receptionsIpAddressColumn" prefWidth="131.0" resizable="false" text="IP Address" />
+                        <TableColumn fx:id="receptionsFileNameColumn" prefWidth="116.0" resizable="false" text="File" />
+                        <TableColumn fx:id="receptionsStatusColumn" prefWidth="51.0" resizable="false" text="Status" />
                      </columns>
                   </TableView>
                </children>

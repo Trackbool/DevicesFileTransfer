@@ -48,6 +48,8 @@ public class MainController implements Initializable, DiscoveryContract.View, Tr
     @FXML
     private TableColumn<Transfer, InetAddress> sendingIpAddressColumn;
     @FXML
+    private TableColumn<Transfer, String> sendingFileNameColumn;
+    @FXML
     private TableColumn<Transfer, String> sendingStatusColumn;
 
     //Receptions
@@ -59,7 +61,9 @@ public class MainController implements Initializable, DiscoveryContract.View, Tr
     @FXML
     private TableColumn<Transfer, InetAddress> receptionsIpAddressColumn;
     @FXML
-    private TableColumn<Transfer, String> receptionsStatus;
+    private TableColumn<Transfer, String> receptionsFileNameColumn;
+    @FXML
+    private TableColumn<Transfer, String> receptionsStatusColumn;
 
     private DiscoveryContract.Presenter discoveryPresenter;
     private TransferContract.Presenter transferPresenter;
@@ -76,13 +80,15 @@ public class MainController implements Initializable, DiscoveryContract.View, Tr
         sendingTableView.setItems(sendingTransfers);
         sendingDeviceNameColumn.setCellValueFactory(new PropertyValueFactory<>("deviceName"));
         sendingIpAddressColumn.setCellValueFactory(new PropertyValueFactory<>("deviceIpAddress"));
+        sendingFileNameColumn.setCellValueFactory(new PropertyValueFactory<>("fileName"));
         sendingStatusColumn.setCellValueFactory(new PropertyValueFactory<>("progressPercentage"));
 
         receptionsTransfers = FXCollections.observableArrayList();
         receptionsTableView.setItems(receptionsTransfers);
         receptionsDeviceNameColumn.setCellValueFactory(new PropertyValueFactory<>("deviceName"));
         receptionsIpAddressColumn.setCellValueFactory(new PropertyValueFactory<>("deviceIpAddress"));
-        receptionsStatus.setCellValueFactory(new PropertyValueFactory<>("progressPercentage"));
+        receptionsFileNameColumn.setCellValueFactory(new PropertyValueFactory<>("fileName"));
+        receptionsStatusColumn.setCellValueFactory(new PropertyValueFactory<>("progressPercentage"));
 
         this.discoveryPresenter = new DiscoveryPresenter(this);
         discoveryPresenter.onViewLoaded();
