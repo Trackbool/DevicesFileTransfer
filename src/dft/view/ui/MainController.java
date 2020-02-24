@@ -3,6 +3,7 @@ package dft.view.ui;
 import dft.model.Device;
 import dft.view.discovery.DiscoveryContract;
 import dft.view.discovery.DiscoveryPresenter;
+import dft.model.Transfer;
 import dft.view.transfer.TransferContract;
 import dft.view.transfer.TransferPresenter;
 import dft.view.ui.util.AlertUtils;
@@ -38,6 +39,28 @@ public class MainController implements Initializable, DiscoveryContract.View, Tr
     @FXML
     private Label labelFileAttached;
 
+    //Sending
+    private ObservableList<Transfer> sendingTransfers;
+    @FXML
+    private TableView<Transfer> sendingTableView;
+    @FXML
+    private TableColumn<Transfer, String> sendingDeviceNameColumn;
+    @FXML
+    private TableColumn<Transfer, InetAddress> sendingIpAddressColumn;
+    @FXML
+    private TableColumn<Transfer, String> sendingStatusColumn;
+
+    //Receptions
+    private ObservableList<Transfer> receptionsTransfers;
+    @FXML
+    private TableView<Transfer> receptionsTableView;
+    @FXML
+    private TableColumn<Transfer, String> receptionsDeviceNameColumn;
+    @FXML
+    private TableColumn<Transfer, InetAddress> receptionsIpAddressColumn;
+    @FXML
+    private TableColumn<Transfer, String> receptionsStatus;
+
     private DiscoveryContract.Presenter discoveryPresenter;
     private TransferContract.Presenter transferPresenter;
 
@@ -48,6 +71,18 @@ public class MainController implements Initializable, DiscoveryContract.View, Tr
         deviceNameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
         osColumn.setCellValueFactory(new PropertyValueFactory<>("os"));
         ipAddressColumn.setCellValueFactory(new PropertyValueFactory<>("ipAddress"));
+
+        sendingTransfers = FXCollections.observableArrayList();
+        sendingTableView.setItems(sendingTransfers);
+        sendingDeviceNameColumn.setCellValueFactory(new PropertyValueFactory<>("deviceName"));
+        sendingIpAddressColumn.setCellValueFactory(new PropertyValueFactory<>("deviceIpAddress"));
+        sendingStatusColumn.setCellValueFactory(new PropertyValueFactory<>("status"));
+
+        receptionsTransfers = FXCollections.observableArrayList();
+        receptionsTableView.setItems(receptionsTransfers);
+        receptionsDeviceNameColumn.setCellValueFactory(new PropertyValueFactory<>("deviceName"));
+        receptionsIpAddressColumn.setCellValueFactory(new PropertyValueFactory<>("deviceIpAddress"));
+        receptionsStatus.setCellValueFactory(new PropertyValueFactory<>("status"));
 
         this.discoveryPresenter = new DiscoveryPresenter(this);
         discoveryPresenter.onViewLoaded();
@@ -119,6 +154,16 @@ public class MainController implements Initializable, DiscoveryContract.View, Tr
         List<Device> devicesList = new ArrayList<>(observableList);
         Device[] devices = new Device[devicesList.size()];
         return devicesList.toArray(devices);
+    }
+
+    @Override
+    public void addSendingTransfer(Transfer transfer) {
+        runOnUiThread(() -> sendingTransfers.add(transfer));
+    }
+
+    @Override
+    public void addReceptionTransfer(Transfer transfer) {
+        runOnUiThread(() -> receptionsTransfers.add(transfer));
     }
 
     private void onQuit() {

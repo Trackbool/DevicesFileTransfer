@@ -1,14 +1,13 @@
 package dft.view.transfer;
 
 import dft.model.Device;
+import dft.model.Transfer;
 import dft.services.transfer.FileReceiver;
 import dft.services.transfer.FileSender;
 import dft.services.transfer.FilesReceiverListener;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.InetAddress;
-import java.net.Socket;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 
@@ -73,19 +72,18 @@ public class TransferPresenter implements TransferContract.Presenter {
     }
 
     private void sendFile(Device device) {
-        FileSender fileSender = this.createFileSender(fileToSend, device);
-
-        final InetAddress deviceAddress = device.getAddress();
-        try (Socket socket = new Socket(deviceAddress, TRANSFER_SERVICE_PORT)) {
-            fileSender.send(socket.getOutputStream());
-        } catch (IOException e) {
-            view.showError("Sending error", e.getMessage());
-        }
+        FileSender fileSender = this.createFileSender(device, fileToSend);
+        fileSender.send();
     }
 
     private FileReceiver createFileReceiver() {
         FileReceiver fileReceiver = new FileReceiver();
         fileReceiver.setCallback(new FileReceiver.Callback() {
+            @Override
+            public void onStart(Transfer transfer) {
+                view.addReceptionTransfer(transfer);
+            }
+
             @Override
             public void onFailure(Exception e) {
                 view.showError("Receiving error", e.getMessage());
@@ -105,9 +103,14 @@ public class TransferPresenter implements TransferContract.Presenter {
         return fileReceiver;
     }
 
-    private FileSender createFileSender(File file, Device device) {
-        FileSender fileSender = new FileSender(file);
+    private FileSender createFileSender(Device device, File file) {
+        FileSender fileSender = new FileSender(device, file);
         fileSender.setCallback(new FileSender.Callback() {
+            @Override
+            public void onStart(Transfer transfer) {
+                view.addSendingTransfer(transfer);
+            }
+
             @Override
             public void onFailure(Exception e) {
                 view.showError("Sending error", e.getMessage());

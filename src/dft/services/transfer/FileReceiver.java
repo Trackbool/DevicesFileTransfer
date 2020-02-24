@@ -1,5 +1,9 @@
 package dft.services.transfer;
 
+import com.google.gson.Gson;
+import dft.model.Device;
+import dft.model.Transfer;
+
 import java.io.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
@@ -39,10 +43,17 @@ public class FileReceiver {
 
         DataInputStream input = new DataInputStream(inputStream);
         receiving.set(true);
+        Transfer transfer;
         String fileName;
         try {
+            String deviceJson = input.readUTF();
+            Device device = new Gson().fromJson(deviceJson, Device.class);
             fileName = input.readUTF();
+            transfer = new Transfer(device, fileName,0);
             fileSize.set(input.readLong());
+            if (callback != null) {
+                callback.onStart(transfer);
+            }
         } catch (IOException e) {
             receiving.set(false);
             if (callback != null)
@@ -58,6 +69,7 @@ public class FileReceiver {
                 if (!receiving.get() || Thread.interrupted()) return;
                 fileWriter.write(buffer, 0, received);
                 receivedCount.getAndAdd(received);
+                transfer.setPercentage(getReceivedPercentage());
                 if (callback != null)
                     callback.onProgressUpdated();
             }
@@ -86,6 +98,8 @@ public class FileReceiver {
     }
 
     public interface Callback {
+        void onStart(Transfer transfer);
+
         void onFailure(Exception e);
 
         void onProgressUpdated();

@@ -1,6 +1,7 @@
 package dft.view.transfer;
 
 import dft.model.Device;
+import dft.model.Transfer;
 
 import java.io.File;
 
@@ -15,6 +16,10 @@ public interface TransferContract {
         void showFileAttachedName(String name);
 
         Device[] getSelectedDevices();
+
+        void addSendingTransfer(Transfer transfer);
+
+        void addReceptionTransfer(Transfer transfer);
 
         void close();
     }
