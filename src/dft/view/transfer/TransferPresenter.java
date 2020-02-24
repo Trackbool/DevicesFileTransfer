@@ -91,7 +91,7 @@ public class TransferPresenter implements TransferContract.Presenter {
 
             @Override
             public void onProgressUpdated() {
-
+                view.refreshReceptionsData();
             }
 
             @Override
@@ -118,7 +118,7 @@ public class TransferPresenter implements TransferContract.Presenter {
 
             @Override
             public void onProgressUpdated() {
-                fileSender.getSentPercentage();
+                view.refreshSendingData();
             }
 
             @Override

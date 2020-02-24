@@ -19,7 +19,11 @@ public interface TransferContract {
 
         void addSendingTransfer(Transfer transfer);
 
+        void refreshSendingData();
+
         void addReceptionTransfer(Transfer transfer);
+
+        void refreshReceptionsData();
 
         void close();
     }

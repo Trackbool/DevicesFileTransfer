@@ -168,8 +168,18 @@ public class MainController implements Initializable, DiscoveryContract.View, Tr
     }
 
     @Override
+    public void refreshSendingData() {
+        sendingTableView.refresh();
+    }
+
+    @Override
     public void addReceptionTransfer(Transfer transfer) {
         runOnUiThread(() -> receptionsTransfers.add(transfer));
+    }
+
+    @Override
+    public void refreshReceptionsData() {
+        receptionsTableView.refresh();
     }
 
     private void onQuit() {
