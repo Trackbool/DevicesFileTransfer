@@ -34,4 +34,8 @@ public class Transfer {
     public int getPercentage() {
         return percentage;
     }
+
+    public String getProgressPercentage() {
+        return percentage + "%";
+    }
 }

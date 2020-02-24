@@ -76,13 +76,13 @@ public class MainController implements Initializable, DiscoveryContract.View, Tr
         sendingTableView.setItems(sendingTransfers);
         sendingDeviceNameColumn.setCellValueFactory(new PropertyValueFactory<>("deviceName"));
         sendingIpAddressColumn.setCellValueFactory(new PropertyValueFactory<>("deviceIpAddress"));
-        sendingStatusColumn.setCellValueFactory(new PropertyValueFactory<>("status"));
+        sendingStatusColumn.setCellValueFactory(new PropertyValueFactory<>("progressPercentage"));
 
         receptionsTransfers = FXCollections.observableArrayList();
         receptionsTableView.setItems(receptionsTransfers);
         receptionsDeviceNameColumn.setCellValueFactory(new PropertyValueFactory<>("deviceName"));
         receptionsIpAddressColumn.setCellValueFactory(new PropertyValueFactory<>("deviceIpAddress"));
-        receptionsStatus.setCellValueFactory(new PropertyValueFactory<>("status"));
+        receptionsStatus.setCellValueFactory(new PropertyValueFactory<>("progressPercentage"));
 
         this.discoveryPresenter = new DiscoveryPresenter(this);
         discoveryPresenter.onViewLoaded();
