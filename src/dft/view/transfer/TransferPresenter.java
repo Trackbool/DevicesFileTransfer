@@ -132,10 +132,10 @@ public class TransferPresenter implements TransferContract.Presenter {
 
     @Override
     public void onDestroy() {
-        this.view = null;
-        fileToSend = null;
         filesReceiverListener.stop();
         fileSendingExecutor.shutdownNow();
         fileReceivingExecutor.shutdownNow();
+        this.view = null;
+        fileToSend = null;
     }
 }
