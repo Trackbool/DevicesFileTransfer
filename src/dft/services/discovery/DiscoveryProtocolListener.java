@@ -33,19 +33,19 @@ public class DiscoveryProtocolListener {
     }
 
     public void start() throws SocketException {
-        if (this.listening.get()) {
+        if (listening.get()) {
             throw new IllegalStateException("Listener already listening");
         }
 
-        this.serverSocket = new DatagramSocket(port);
-        this.listening.set(true);
+        serverSocket = new DatagramSocket(port);
+        listening.set(true);
 
         new Thread(this::listen).start();
     }
 
     public void stop() {
         listening.set(false);
-        this.serverSocket.close();
+        serverSocket.close();
     }
 
     private void listen() {
@@ -80,7 +80,7 @@ public class DiscoveryProtocolListener {
     private DatagramPacket receiveRequest() throws IOException {
         byte[] receiveData = new byte[1024];
         DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
-        this.serverSocket.receive(receivePacket);
+        serverSocket.receive(receivePacket);
         return receivePacket;
     }
 
