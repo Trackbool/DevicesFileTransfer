@@ -1,33 +1,24 @@
-package dft.services.transfer;
-
-import com.google.gson.Gson;
-import dft.model.Device;
-import dft.model.DeviceFactory;
-import dft.model.Transfer;
+package dft.services.transfer.sender;
 
 import java.io.*;
-import java.net.InetAddress;
-import java.net.Socket;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 
 public class FileSender {
     private final static int BUFFER_SIZE = 8192;
-    private final Device device;
     private final File file;
-    private Callback callback;
     private final AtomicBoolean sending;
+    private Callback callback;
     private AtomicLong sentCount;
 
-    public FileSender(Device device, File file) {
-        this.device = device;
+    public FileSender(File file) {
         this.file = file;
         this.sending = new AtomicBoolean(false);
         this.sentCount = new AtomicLong(0);
     }
 
-    public FileSender(Device device, File file, Callback callback) {
-        this(device, file);
+    public FileSender(File file, Callback callback) {
+        this(file);
         this.callback = callback;
     }
 
@@ -43,32 +34,14 @@ public class FileSender {
         return (int) ((sentCount.get() * 100) / file.length());
     }
 
-    public void send() {
+    public void send(OutputStream outputStream) {
         if (sending.get()) throw new IllegalStateException("Already sending the file");
 
-        Socket socket;
-        OutputStream outputStream;
-        try {
-            socket = new Socket(device.getAddress(), 5001);
-            outputStream = socket.getOutputStream();
-        } catch (IOException e) {
-            if (callback != null)
-                callback.onFailure(e);
-            return;
-        }
-
         sending.set(true);
-        Transfer transfer = new Transfer(
-                DeviceFactory.getCurrentDevice(socket.getLocalAddress()), file.getName(), 0);
         if (callback != null)
-            callback.onStart(transfer);
+            callback.onStart();
         try (FileInputStream fileReader = new FileInputStream(file);
              DataOutputStream output = new DataOutputStream(outputStream)) {
-            InetAddress currentDeviceAddress = socket.getLocalAddress();
-            Device currentDevice = DeviceFactory.getCurrentDevice(currentDeviceAddress);
-            output.writeUTF(new Gson().toJson(currentDevice));
-            output.writeUTF(file.getName());
-            output.writeLong(file.length());
 
             byte[] buffer = new byte[BUFFER_SIZE];
             sentCount.set(0);
@@ -77,7 +50,6 @@ public class FileSender {
                 if (!sending.get() || Thread.interrupted()) return;
                 output.write(buffer, 0, sent);
                 sentCount.getAndAdd(sent);
-                transfer.setProgress(getSentPercentage());
                 if (callback != null)
                     callback.onProgressUpdated();
             }
@@ -102,7 +74,7 @@ public class FileSender {
     }
 
     public interface Callback {
-        void onStart(Transfer transfer);
+        void onStart();
 
         void onFailure(Exception e);
 

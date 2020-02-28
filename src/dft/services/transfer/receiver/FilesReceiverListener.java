@@ -1,4 +1,4 @@
-package dft.services.transfer;
+package dft.services.transfer.receiver;
 
 import java.io.IOException;
 import java.io.InputStream;

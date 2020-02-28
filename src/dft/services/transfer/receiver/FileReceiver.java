@@ -1,8 +1,4 @@
-package dft.services.transfer;
-
-import com.google.gson.Gson;
-import dft.model.Device;
-import dft.model.Transfer;
+package dft.services.transfer.receiver;
 
 import java.io.*;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -12,12 +8,11 @@ public class FileReceiver {
     private final static int BUFFER_SIZE = 8192;
     private Callback callback;
     private final AtomicBoolean receiving;
-    private AtomicLong fileSize;
+    private Long fileSize;
     private AtomicLong receivedCount;
 
     public FileReceiver() {
         this.receiving = new AtomicBoolean(false);
-        this.fileSize = new AtomicLong(0);
         this.receivedCount = new AtomicLong(0);
     }
 
@@ -35,46 +30,32 @@ public class FileReceiver {
     }
 
     public int getReceivedPercentage() {
-        return (int) ((receivedCount.get() * 100) / fileSize.get());
+        if (fileSize == null) throw new IllegalStateException("No transfer started");
+
+        return (int) ((receivedCount.get() * 100) / fileSize);
     }
 
-    public void receive(InputStream inputStream) {
+    public void receive(String fileName, long fileSize, InputStream inputStream) {
         if (receiving.get()) throw new IllegalStateException("Already receiving the file");
 
-        DataInputStream input = new DataInputStream(inputStream);
+        this.fileSize = fileSize;
         receiving.set(true);
-        Transfer transfer;
-        String fileName;
-        try {
-            String deviceJson = input.readUTF();
-            Device device = new Gson().fromJson(deviceJson, Device.class);
-            fileName = input.readUTF();
-            transfer = new Transfer(device, fileName,0);
-            fileSize.set(input.readLong());
-            if (callback != null) {
-                callback.onStart(transfer);
-            }
-        } catch (IOException e) {
-            receiving.set(false);
-            if (callback != null)
-                callback.onFailure(e);
-            return;
+        if (callback != null) {
+            callback.onStart();
         }
-
         try (BufferedOutputStream fileWriter = new BufferedOutputStream(new FileOutputStream(fileName))) {
             byte[] buffer = new byte[BUFFER_SIZE];
             receivedCount.set(0);
             int received;
-            while ((received = input.read(buffer, 0, buffer.length)) != -1) {
+            while ((received = inputStream.read(buffer, 0, buffer.length)) != -1) {
                 if (!receiving.get() || Thread.interrupted()) return;
                 fileWriter.write(buffer, 0, received);
                 receivedCount.getAndAdd(received);
-                transfer.setProgress(getReceivedPercentage());
                 if (callback != null)
                     callback.onProgressUpdated();
             }
             if (callback != null) {
-                if (receivedCount.get() == fileSize.get()) {
+                if (receivedCount.get() == fileSize) {
                     callback.onSuccess(new File(fileName));
                 } else {
                     callback.onFailure(new Exception("The file has not been completely transferred"));
@@ -87,7 +68,7 @@ public class FileReceiver {
         } finally {
             receiving.set(false);
             try {
-                input.close();
+                inputStream.close();
             } catch (IOException ignored) {
             }
         }
@@ -98,7 +79,7 @@ public class FileReceiver {
     }
 
     public interface Callback {
-        void onStart(Transfer transfer);
+        void onStart();
 
         void onFailure(Exception e);
 

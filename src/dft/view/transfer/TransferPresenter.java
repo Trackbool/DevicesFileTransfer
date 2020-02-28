@@ -1,10 +1,9 @@
 package dft.view.transfer;
 
 import dft.model.Device;
-import dft.model.Transfer;
-import dft.services.transfer.FileReceiver;
-import dft.services.transfer.FileSender;
-import dft.services.transfer.FilesReceiverListener;
+import dft.services.transfer.receiver.FileReceiverProtocol;
+import dft.services.transfer.receiver.FilesReceiverListener;
+import dft.services.transfer.sender.FileSenderProtocol;
 
 import java.io.File;
 import java.io.IOException;
@@ -29,7 +28,7 @@ public class TransferPresenter implements TransferContract.Presenter {
     @Override
     public void onViewLoaded() {
         filesReceiverListener = new FilesReceiverListener(TRANSFER_SERVICE_PORT, inputStream -> {
-            FileReceiver fileReceiver = createFileReceiver();
+            FileReceiverProtocol fileReceiver = createFileReceiver();
             fileReceivingExecutor.execute(() -> fileReceiver.receive(inputStream));
         });
 
@@ -72,16 +71,16 @@ public class TransferPresenter implements TransferContract.Presenter {
     }
 
     private void sendFile(Device device) {
-        FileSender fileSender = createFileSender(device, fileToSend);
+        FileSenderProtocol fileSender = createFileSender(device, fileToSend);
         fileSender.send();
     }
 
-    private FileReceiver createFileReceiver() {
-        FileReceiver fileReceiver = new FileReceiver();
-        fileReceiver.setCallback(new FileReceiver.Callback() {
+    private FileReceiverProtocol createFileReceiver() {
+        FileReceiverProtocol fileReceiver = new FileReceiverProtocol();
+        fileReceiver.setCallback(new FileReceiverProtocol.Callback() {
             @Override
-            public void onStart(Transfer transfer) {
-                view.addReceptionTransfer(transfer);
+            public void onStart() {
+                view.addReceptionTransfer(fileReceiver.getTransfer());
             }
 
             @Override
@@ -103,12 +102,12 @@ public class TransferPresenter implements TransferContract.Presenter {
         return fileReceiver;
     }
 
-    private FileSender createFileSender(Device device, File file) {
-        FileSender fileSender = new FileSender(device, file);
-        fileSender.setCallback(new FileSender.Callback() {
+    private FileSenderProtocol createFileSender(Device device, File file) {
+        FileSenderProtocol fileSender = new FileSenderProtocol(device, file);
+        fileSender.setCallback(new FileSenderProtocol.Callback() {
             @Override
-            public void onStart(Transfer transfer) {
-                view.addSendingTransfer(transfer);
+            public void onStart() {
+                view.addSendingTransfer(fileSender.getTransfer());
             }
 
             @Override
