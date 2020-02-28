@@ -42,16 +42,20 @@ public class FileSender {
             callback.onStart();
         try (FileInputStream fileReader = new FileInputStream(file);
              DataOutputStream output = new DataOutputStream(outputStream)) {
-
             byte[] buffer = new byte[BUFFER_SIZE];
             sentCount.set(0);
             int sent;
+            int currentPercentage = 0;
             while ((sent = fileReader.read(buffer, 0, buffer.length)) != -1) {
                 if (!sending.get() || Thread.interrupted()) return;
                 output.write(buffer, 0, sent);
                 sentCount.getAndAdd(sent);
-                if (callback != null)
+
+                int sentPercentage = getSentPercentage();
+                if (callback != null && currentPercentage < sentPercentage) {
+                    currentPercentage = sentPercentage;
                     callback.onProgressUpdated();
+                }
             }
             if (callback != null) {
                 if (sentCount.get() == file.length()) {

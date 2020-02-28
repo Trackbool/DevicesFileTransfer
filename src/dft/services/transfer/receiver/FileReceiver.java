@@ -47,12 +47,17 @@ public class FileReceiver {
             byte[] buffer = new byte[BUFFER_SIZE];
             receivedCount.set(0);
             int received;
+            int currentPercentage = 0;
             while ((received = inputStream.read(buffer, 0, buffer.length)) != -1) {
                 if (!receiving.get() || Thread.interrupted()) return;
                 fileWriter.write(buffer, 0, received);
                 receivedCount.getAndAdd(received);
-                if (callback != null)
+
+                int receivedPercentage = getReceivedPercentage();
+                if (callback != null && currentPercentage < receivedPercentage) {
+                    currentPercentage = receivedPercentage;
                     callback.onProgressUpdated();
+                }
             }
             if (callback != null) {
                 if (receivedCount.get() == fileSize) {
