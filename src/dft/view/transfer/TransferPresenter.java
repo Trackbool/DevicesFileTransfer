@@ -22,14 +22,14 @@ public class TransferPresenter implements TransferContract.Presenter {
 
     public TransferPresenter(TransferContract.View view) {
         this.view = view;
-        this.fileSendingExecutor = (ThreadPoolExecutor) Executors.newFixedThreadPool(10);
-        this.fileReceivingExecutor = (ThreadPoolExecutor) Executors.newFixedThreadPool(10);
+        fileSendingExecutor = (ThreadPoolExecutor) Executors.newFixedThreadPool(10);
+        fileReceivingExecutor = (ThreadPoolExecutor) Executors.newFixedThreadPool(10);
     }
 
     @Override
     public void onViewLoaded() {
         filesReceiverListener = new FilesReceiverListener(TRANSFER_SERVICE_PORT, inputStream -> {
-            FileReceiver fileReceiver = this.createFileReceiver();
+            FileReceiver fileReceiver = createFileReceiver();
             fileReceivingExecutor.execute(() -> fileReceiver.receive(inputStream));
         });
 
@@ -37,8 +37,8 @@ public class TransferPresenter implements TransferContract.Presenter {
             try {
                 filesReceiverListener.start();
             } catch (IOException e) {
-                this.view.showError("Initialization error", e.getMessage());
-                this.view.close();
+                view.showError("Initialization error", e.getMessage());
+                view.close();
             }
         }).start();
     }
@@ -50,7 +50,7 @@ public class TransferPresenter implements TransferContract.Presenter {
 
     @Override
     public void onFileAttached(File file) {
-        this.fileToSend = file;
+        fileToSend = file;
         view.showFileAttachedName(fileToSend.getName());
     }
 
@@ -67,12 +67,12 @@ public class TransferPresenter implements TransferContract.Presenter {
         }
 
         for (Device device : devices) {
-            fileSendingExecutor.execute(() -> this.sendFile(device));
+            fileSendingExecutor.execute(() -> sendFile(device));
         }
     }
 
     private void sendFile(Device device) {
-        FileSender fileSender = this.createFileSender(device, fileToSend);
+        FileSender fileSender = createFileSender(device, fileToSend);
         fileSender.send();
     }
 
@@ -135,7 +135,7 @@ public class TransferPresenter implements TransferContract.Presenter {
         filesReceiverListener.stop();
         fileSendingExecutor.shutdownNow();
         fileReceivingExecutor.shutdownNow();
-        this.view = null;
+        view = null;
         fileToSend = null;
     }
 }

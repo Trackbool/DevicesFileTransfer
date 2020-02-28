@@ -94,7 +94,7 @@ public class FileReceiver {
     }
 
     public void cancel() {
-        this.receiving.set(false);
+        receiving.set(false);
     }
 
     public interface Callback {

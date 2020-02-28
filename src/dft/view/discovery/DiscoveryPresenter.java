@@ -37,16 +37,16 @@ public class DiscoveryPresenter implements DiscoveryContract.Presenter {
         try {
             discoveryListener.start();
         } catch (SocketException e) {
-            this.view.showError("Initialization error", e.getMessage());
-            this.view.close();
+            view.showError("Initialization error", e.getMessage());
+            view.close();
         }
         discoverySender = DiscoveryProtocolSenderFactory.getDefault(DISCOVERY_SERVICE_PORT);
-        this.discoverDevices();
+        discoverDevices();
     }
 
     @Override
     public void onDiscoverDevicesButtonClicked() {
-        this.discoverDevices();
+        discoverDevices();
     }
 
     private void discoverDevices() {
@@ -54,13 +54,13 @@ public class DiscoveryPresenter implements DiscoveryContract.Presenter {
             discoverySender.discover();
             view.clearDevicesList();
         } catch (SocketException e) {
-            this.view.showError("Discover error", e.getMessage());
+            view.showError("Discover error", e.getMessage());
         }
     }
 
     @Override
     public void onDestroy() {
-        this.discoveryListener.stop();
-        this.view = null;
+        discoveryListener.stop();
+        view = null;
     }
 }
