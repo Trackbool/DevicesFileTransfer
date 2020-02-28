@@ -63,7 +63,7 @@ public class MainController implements Initializable, DiscoveryContract.View, Tr
     @FXML
     private TableColumn<Transfer, String> receptionsFileNameColumn;
     @FXML
-    private TableColumn<Transfer, String> receptionsStatusColumn;
+    private TableColumn<Transfer, String> receptionsProgressColumn;
 
     private DiscoveryContract.Presenter discoveryPresenter;
     private TransferContract.Presenter transferPresenter;
@@ -88,7 +88,7 @@ public class MainController implements Initializable, DiscoveryContract.View, Tr
         receptionsDeviceNameColumn.setCellValueFactory(new PropertyValueFactory<>("deviceName"));
         receptionsIpAddressColumn.setCellValueFactory(new PropertyValueFactory<>("deviceIpAddress"));
         receptionsFileNameColumn.setCellValueFactory(new PropertyValueFactory<>("fileName"));
-        receptionsStatusColumn.setCellValueFactory(new PropertyValueFactory<>("progressPercentage"));
+        receptionsProgressColumn.setCellValueFactory(new PropertyValueFactory<>("progressPercentage"));
 
         this.discoveryPresenter = new DiscoveryPresenter(this);
         discoveryPresenter.onViewLoaded();

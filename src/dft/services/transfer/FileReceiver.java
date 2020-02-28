@@ -69,7 +69,7 @@ public class FileReceiver {
                 if (!receiving.get() || Thread.interrupted()) return;
                 fileWriter.write(buffer, 0, received);
                 receivedCount.getAndAdd(received);
-                transfer.setPercentage(getReceivedPercentage());
+                transfer.setProgress(getReceivedPercentage());
                 if (callback != null)
                     callback.onProgressUpdated();
             }

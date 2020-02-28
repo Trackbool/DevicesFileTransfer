@@ -77,7 +77,7 @@ public class FileSender {
                 if (!sending.get() || Thread.interrupted()) return;
                 output.write(buffer, 0, sent);
                 sentCount.getAndAdd(sent);
-                transfer.setPercentage(getSentPercentage());
+                transfer.setProgress(getSentPercentage());
                 if (callback != null)
                     callback.onProgressUpdated();
             }
