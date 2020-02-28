@@ -4,11 +4,13 @@ public class Transfer {
     private Device device;
     private String fileName;
     private int progress;
+    private TransferStatus status;
 
     public Transfer(Device device, String fileName, int progress) {
         this.device = device;
         this.fileName = fileName;
         this.progress = progress;
+        status = TransferStatus.NOT_STARTED;
     }
 
     public Device getDevice() {
@@ -37,5 +39,31 @@ public class Transfer {
 
     public String getProgressPercentage() {
         return progress + "%";
+    }
+
+    public TransferStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(TransferStatus status) {
+        this.status = status;
+    }
+
+    public String getStatusValue() {
+        return status.value;
+    }
+
+    public enum TransferStatus {
+        NOT_STARTED("Not started"),
+        TRANSFERRING("Transferring"),
+        FAILED("Failed"),
+        SUCCEEDED("Succeeded"),
+        CANCELED("Canceled");
+
+        private String value;
+
+        TransferStatus(String value) {
+            this.value = value;
+        }
     }
 }

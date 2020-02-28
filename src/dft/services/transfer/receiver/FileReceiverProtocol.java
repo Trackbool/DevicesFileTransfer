@@ -64,11 +64,13 @@ public class FileReceiverProtocol {
         FileReceiver.Callback fileReceiverCallback = new FileReceiver.Callback() {
             @Override
             public void onStart() {
+                transfer.setStatus(Transfer.TransferStatus.TRANSFERRING);
                 callback.onStart();
             }
 
             @Override
             public void onFailure(Exception e) {
+                transfer.setStatus(Transfer.TransferStatus.FAILED);
                 callback.onFailure(e);
             }
 
@@ -80,6 +82,7 @@ public class FileReceiverProtocol {
 
             @Override
             public void onSuccess(File file) {
+                transfer.setStatus(Transfer.TransferStatus.SUCCEEDED);
                 callback.onSuccess(file);
             }
         };

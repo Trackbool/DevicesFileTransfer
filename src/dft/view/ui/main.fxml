@@ -11,8 +11,8 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<ScrollPane prefHeight="600.0" prefViewportHeight="600.0" prefViewportWidth="800.0" prefWidth="900.0" stylesheets="@resources/bootstrap3.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="dft.view.ui.MainController">
-   <VBox layoutX="250.0" layoutY="-38.0" prefHeight="600.0" prefWidth="900.0" spacing="5.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+<ScrollPane prefHeight="600.0" prefViewportHeight="600.0" prefViewportWidth="800.0" prefWidth="1113.0" stylesheets="@resources/bootstrap3.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="dft.view.ui.MainController">
+   <VBox layoutX="250.0" layoutY="-38.0" prefHeight="600.0" prefWidth="1112.0" spacing="5.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
       <padding>
          <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
       </padding>
@@ -58,24 +58,25 @@
             <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
          </padding>
          <children>
-            <VBox alignment="TOP_CENTER" prefHeight="40.0" prefWidth="440.0">
+            <VBox alignment="TOP_CENTER" prefHeight="218.0" prefWidth="560.0">
                <children>
                   <Label text="Sending">
                      <font>
                         <Font size="16.0" />
                      </font>
                   </Label>
-                  <TableView fx:id="sendingTableView" prefWidth="440.0">
+                  <TableView fx:id="sendingTableView" prefWidth="494.0">
                     <columns>
                       <TableColumn fx:id="sendingDeviceNameColumn" prefWidth="140.0" resizable="false" text="Device Name" />
-                      <TableColumn fx:id="sendingIpAddressColumn" prefWidth="131.0" resizable="false" text="IP Address" />
-                      <TableColumn fx:id="sendingFileNameColumn" prefWidth="116.0" resizable="false" text="File" />
-                      <TableColumn fx:id="sendingStatusColumn" prefWidth="51.0" resizable="false" text="Status" />
+                      <TableColumn fx:id="sendingIpAddressColumn" prefWidth="105.0" resizable="false" text="IP Address" />
+                      <TableColumn fx:id="sendingFileNameColumn" prefWidth="142.0" resizable="false" text="File" />
+                      <TableColumn fx:id="sendingProgressColumn" prefWidth="69.0" resizable="false" text="Progress" />
+                       <TableColumn fx:id="sendingStatusColumn" prefWidth="88.0" resizable="false" text="Status" />
                     </columns>
                   </TableView>
                </children>
             </VBox>
-            <VBox alignment="TOP_CENTER" prefHeight="40.0" prefWidth="440.0">
+            <VBox alignment="TOP_CENTER" prefHeight="218.0" prefWidth="560.0">
                <children>
                   <Label text="Receiving">
                      <font>
@@ -85,9 +86,10 @@
                   <TableView fx:id="receptionsTableView" prefWidth="440.0">
                      <columns>
                         <TableColumn fx:id="receptionsDeviceNameColumn" prefWidth="140.0" resizable="false" text="Device Name" />
-                        <TableColumn fx:id="receptionsIpAddressColumn" prefWidth="131.0" resizable="false" text="IP Address" />
-                        <TableColumn fx:id="receptionsFileNameColumn" prefWidth="116.0" resizable="false" text="File" />
-                        <TableColumn fx:id="receptionsProgressColumn" prefWidth="51.0" resizable="false" text="Status" />
+                        <TableColumn fx:id="receptionsIpAddressColumn" prefWidth="105.0" resizable="false" text="IP Address" />
+                        <TableColumn fx:id="receptionsFileNameColumn" prefWidth="145.0" resizable="false" text="File" />
+                        <TableColumn fx:id="receptionsProgressColumn" prefWidth="67.0" resizable="false" text="Progress" />
+                        <TableColumn fx:id="receptionsStatusColumn" prefWidth="87.0" resizable="false" text="Status" />
                      </columns>
                   </TableView>
                </children>

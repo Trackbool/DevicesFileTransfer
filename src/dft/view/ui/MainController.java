@@ -50,6 +50,8 @@ public class MainController implements Initializable, DiscoveryContract.View, Tr
     @FXML
     private TableColumn<Transfer, String> sendingFileNameColumn;
     @FXML
+    private TableColumn<Transfer, String> sendingProgressColumn;
+    @FXML
     private TableColumn<Transfer, String> sendingStatusColumn;
 
     //Receptions
@@ -64,6 +66,8 @@ public class MainController implements Initializable, DiscoveryContract.View, Tr
     private TableColumn<Transfer, String> receptionsFileNameColumn;
     @FXML
     private TableColumn<Transfer, String> receptionsProgressColumn;
+    @FXML
+    private TableColumn<Transfer, String> receptionsStatusColumn;
 
     private DiscoveryContract.Presenter discoveryPresenter;
     private TransferContract.Presenter transferPresenter;
@@ -81,7 +85,8 @@ public class MainController implements Initializable, DiscoveryContract.View, Tr
         sendingDeviceNameColumn.setCellValueFactory(new PropertyValueFactory<>("deviceName"));
         sendingIpAddressColumn.setCellValueFactory(new PropertyValueFactory<>("deviceIpAddress"));
         sendingFileNameColumn.setCellValueFactory(new PropertyValueFactory<>("fileName"));
-        sendingStatusColumn.setCellValueFactory(new PropertyValueFactory<>("progressPercentage"));
+        sendingProgressColumn.setCellValueFactory(new PropertyValueFactory<>("progressPercentage"));
+        sendingStatusColumn.setCellValueFactory(new PropertyValueFactory<>("statusValue"));
 
         receptionsTransfers = FXCollections.observableArrayList();
         receptionsTableView.setItems(receptionsTransfers);
@@ -89,6 +94,7 @@ public class MainController implements Initializable, DiscoveryContract.View, Tr
         receptionsIpAddressColumn.setCellValueFactory(new PropertyValueFactory<>("deviceIpAddress"));
         receptionsFileNameColumn.setCellValueFactory(new PropertyValueFactory<>("fileName"));
         receptionsProgressColumn.setCellValueFactory(new PropertyValueFactory<>("progressPercentage"));
+        receptionsStatusColumn.setCellValueFactory(new PropertyValueFactory<>("statusValue"));
 
         this.discoveryPresenter = new DiscoveryPresenter(this);
         discoveryPresenter.onViewLoaded();

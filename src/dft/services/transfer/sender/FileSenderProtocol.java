@@ -81,11 +81,13 @@ public class FileSenderProtocol {
         FileSender.Callback fileSenderCallback = new FileSender.Callback() {
             @Override
             public void onStart() {
+                transfer.setStatus(Transfer.TransferStatus.TRANSFERRING);
                 callback.onStart();
             }
 
             @Override
             public void onFailure(Exception e) {
+                transfer.setStatus(Transfer.TransferStatus.FAILED);
                 callback.onFailure(e);
             }
 
@@ -97,6 +99,7 @@ public class FileSenderProtocol {
 
             @Override
             public void onSuccess(File file) {
+                transfer.setStatus(Transfer.TransferStatus.SUCCEEDED);
                 callback.onSuccess(file);
             }
         };
