@@ -16,7 +16,7 @@
       <padding>
          <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
       </padding>
-      <HBox prefHeight="39.0" spacing="5.0">
+      <HBox prefHeight="39.0" prefWidth="931.0" spacing="5.0">
          <padding>
             <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
          </padding>
@@ -28,13 +28,20 @@
             </Button>
          </children>
       </HBox>
-      <TableView fx:id="devicesTableView" prefHeight="200.0" prefWidth="200.0">
-        <columns>
-          <TableColumn fx:id="deviceNameColumn" editable="false" prefWidth="300" resizable="false" text="Device Name" />
-          <TableColumn fx:id="osColumn" editable="false" prefWidth="300" resizable="false" text="OS" />
-          <TableColumn fx:id="ipAddressColumn" editable="false" prefWidth="300" resizable="false" text="IP Address" />
-        </columns>
-      </TableView>
+      <HBox alignment="CENTER" prefHeight="211.0" prefWidth="1102.0" spacing="5.0">
+         <padding>
+            <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+         </padding>
+         <children>
+            <TableView fx:id="devicesTableView" fixedCellSize="0.0" prefHeight="201.0" prefWidth="903.0">
+              <columns>
+                <TableColumn fx:id="deviceNameColumn" editable="false" prefWidth="300" resizable="false" text="Device Name" />
+                <TableColumn fx:id="osColumn" editable="false" prefWidth="300" resizable="false" text="OS" />
+                <TableColumn fx:id="ipAddressColumn" editable="false" prefWidth="300" resizable="false" text="IP Address" />
+              </columns>
+            </TableView>
+         </children>
+      </HBox>
       <HBox alignment="BOTTOM_LEFT" prefHeight="39.0" spacing="5.0">
          <padding>
             <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
