@@ -10,6 +10,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.net.Socket;
 
 public class FileSenderProtocol {
@@ -24,6 +25,7 @@ public class FileSenderProtocol {
         this.remoteDevice = remoteDevice;
         this.file = file;
         this.fileSender = new FileSender(file);
+        transfer = new Transfer(remoteDevice, file.getName(), 0);
     }
 
     public FileSenderProtocol(Device remoteDevice, File file, Callback callback) {
@@ -50,18 +52,19 @@ public class FileSenderProtocol {
     }
 
     public void send() {
-        transfer = new Transfer(remoteDevice, file.getName(), 0);
-
         try {
-            Socket socket = new Socket(remoteDevice.getAddress(), SOCKET_PORT);
+            Socket socket = new Socket();
+            socket.connect(new InetSocketAddress(remoteDevice.getAddress(), SOCKET_PORT), 3000);
             InetAddress currentDeviceAddress = socket.getLocalAddress();
             OutputStream outputStream = socket.getOutputStream();
             sendFileData(currentDeviceAddress, outputStream);
 
             fileSender.send(outputStream);
         } catch (IOException e) {
-            if (callback != null)
+            if (callback != null) {
+                transfer.setStatus(Transfer.TransferStatus.FAILED);
                 callback.onFailure(e);
+            }
         }
     }
 

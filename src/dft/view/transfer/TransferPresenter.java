@@ -66,13 +66,16 @@ public class TransferPresenter implements TransferContract.Presenter {
         }
 
         for (Device device : devices) {
-            fileSendingExecutor.execute(() -> sendFile(device));
+            sendFile(device);
         }
     }
 
     private void sendFile(Device device) {
-        FileSenderProtocol fileSender = createFileSender(device, fileToSend);
-        fileSender.send();
+        fileSendingExecutor.execute(() -> {
+            FileSenderProtocol fileSender = createFileSender(device, fileToSend);
+            view.addSendingTransfer(fileSender.getTransfer());
+            fileSender.send();
+        });
     }
 
     private FileReceiverProtocol createFileReceiver() {
@@ -109,7 +112,7 @@ public class TransferPresenter implements TransferContract.Presenter {
         fileSender.setCallback(new FileSenderProtocol.Callback() {
             @Override
             public void onStart() {
-                view.addSendingTransfer(fileSender.getTransfer());
+                //The transfer is added to the list when button is clicked, not when starts
             }
 
             @Override
