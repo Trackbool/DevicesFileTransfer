@@ -85,6 +85,7 @@ public class TransferPresenter implements TransferContract.Presenter {
 
             @Override
             public void onFailure(Exception e) {
+                view.refreshReceptionsData();
                 view.showError("Receiving error", e.getMessage());
             }
 
@@ -95,6 +96,7 @@ public class TransferPresenter implements TransferContract.Presenter {
 
             @Override
             public void onSuccess(File file) {
+                view.refreshReceptionsData();
                 view.showAlert("Receiving success", file.getName());
             }
         });
@@ -112,6 +114,7 @@ public class TransferPresenter implements TransferContract.Presenter {
 
             @Override
             public void onFailure(Exception e) {
+                view.refreshSendingData();
                 view.showError("Sending error", e.getMessage());
             }
 
@@ -122,6 +125,7 @@ public class TransferPresenter implements TransferContract.Presenter {
 
             @Override
             public void onSuccess(File file) {
+                view.refreshSendingData();
                 view.showAlert("Sending success", file.getName());
             }
         });
