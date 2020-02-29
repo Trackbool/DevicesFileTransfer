@@ -2,11 +2,15 @@ package dft.view.discovery;
 
 import dft.model.Device;
 
+import java.util.List;
+
 public interface DiscoveryContract {
     interface View {
         void addDevice(Device device);
 
         void showError(String title, String message);
+
+        List<Device> getDevicesList();
 
         void clearDevicesList();
 

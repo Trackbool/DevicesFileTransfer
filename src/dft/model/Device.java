@@ -35,13 +35,11 @@ public class Device {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Device device = (Device) o;
-        return name.equals(device.name) &&
-                os.equals(device.os) &&
-                address.equals(device.address);
+        return address.equals(device.address);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, os, address);
+        return Objects.hash(address);
     }
 }

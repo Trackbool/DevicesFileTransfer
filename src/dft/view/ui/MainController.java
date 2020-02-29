@@ -128,6 +128,11 @@ public class MainController implements Initializable, DiscoveryContract.View, Tr
     }
 
     @Override
+    public List<Device> getDevicesList() {
+        return devices;
+    }
+
+    @Override
     public void showAlert(String title, String message) {
         runOnUiThread(() -> AlertUtils.showMessage(title, message));
     }
