@@ -45,7 +45,7 @@ public class DiscoveryPresenter implements DiscoveryContract.Presenter {
     }
 
     @Override
-    public void onDiscoverDevicesButtonClicked() {
+    public void onDiscoverDevicesEvent() {
         discoverDevices();
     }
 

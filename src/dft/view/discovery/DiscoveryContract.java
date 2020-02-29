@@ -16,7 +16,7 @@ public interface DiscoveryContract {
     interface Presenter {
         void onViewLoaded();
 
-        void onDiscoverDevicesButtonClicked();
+        void onDiscoverDevicesEvent();
 
         void onDestroy();
     }

@@ -104,7 +104,7 @@ public class MainController implements Initializable, DiscoveryContract.View, Tr
 
     @FXML
     private void discoverDevicesButtonClicked() {
-        discoveryPresenter.onDiscoverDevicesButtonClicked();
+        discoveryPresenter.onDiscoverDevicesEvent();
     }
 
     @FXML
