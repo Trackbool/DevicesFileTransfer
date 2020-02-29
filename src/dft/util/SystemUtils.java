@@ -10,4 +10,8 @@ public class SystemUtils {
             return env.get("COMPUTERNAME");
         else return env.getOrDefault("HOSTNAME", "Unknown");
     }
+
+    public static String getOs() {
+        return System.getProperty("os.name");
+    }
 }

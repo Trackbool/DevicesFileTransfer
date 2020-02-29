@@ -16,7 +16,7 @@ public class DiscoveryProtocolListenerFactory {
 
     private static DeviceProperties getDeviceProperties() {
         String systemName = SystemUtils.getSystemName();
-        String systemOs = System.getProperty("os.name");
+        String systemOs = SystemUtils.getOs();
         return new DeviceProperties(systemName, systemOs);
     }
 }
