@@ -37,7 +37,9 @@ public class FilesReceiverListener {
     public void stop() {
         listening.set(false);
         try {
-            serverSocket.close();
+            if (serverSocket != null) {
+                serverSocket.close();
+            }
         } catch (IOException ignored) {
         }
     }
