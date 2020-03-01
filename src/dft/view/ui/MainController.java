@@ -1,6 +1,7 @@
 package dft.view.ui;
 
 import dft.model.Device;
+import dft.util.SystemUtils;
 import dft.view.discovery.DiscoveryContract;
 import dft.view.discovery.DiscoveryPresenter;
 import dft.model.Transfer;
@@ -191,6 +192,11 @@ public class MainController implements Initializable, DiscoveryContract.View, Tr
     @Override
     public void refreshReceptionsData() {
         receptionsTableView.refresh();
+    }
+
+    @Override
+    public File getDownloadsDirectory() {
+        return SystemUtils.getDownloadsDirectory();
     }
 
     private void onQuit() {
