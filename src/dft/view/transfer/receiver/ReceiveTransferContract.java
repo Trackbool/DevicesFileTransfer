@@ -1,25 +1,14 @@
-package dft.view.transfer;
+package dft.view.transfer.receiver;
 
-import dft.model.Device;
 import dft.model.Transfer;
 
 import java.io.File;
 
-public interface TransferContract {
+public interface ReceiveTransferContract {
     interface View {
         void showError(String title, String message);
 
         void showAlert(String title, String message);
-
-        void browseFile();
-
-        void showFileAttachedName(String name);
-
-        Device[] getSelectedDevices();
-
-        void addSendingTransfer(Transfer transfer);
-
-        void refreshSendingData();
 
         void addReceptionTransfer(Transfer transfer);
 
@@ -32,12 +21,6 @@ public interface TransferContract {
 
     interface Presenter {
         void onViewLoaded();
-
-        void onBrowseFileButtonClicked();
-
-        void onFileAttached(File file);
-
-        void onSendFileButtonClicked();
 
         void onDestroy();
     }

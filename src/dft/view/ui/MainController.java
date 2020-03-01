@@ -5,8 +5,10 @@ import dft.util.SystemUtils;
 import dft.view.discovery.DiscoveryContract;
 import dft.view.discovery.DiscoveryPresenter;
 import dft.model.Transfer;
-import dft.view.transfer.TransferContract;
-import dft.view.transfer.TransferPresenter;
+import dft.view.transfer.receiver.ReceiveTransferContract;
+import dft.view.transfer.receiver.ReceiveTransferPresenter;
+import dft.view.transfer.sender.SendTransferContract;
+import dft.view.transfer.sender.SendTransferPresenter;
 import dft.view.ui.util.AlertUtils;
 import dft.view.ui.util.WindowUtils;
 import javafx.application.Platform;
@@ -15,6 +17,7 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
+import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -27,7 +30,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 
-public class MainController implements Initializable, DiscoveryContract.View, TransferContract.View {
+public class MainController implements Initializable, DiscoveryContract.View,
+        ReceiveTransferContract.View, SendTransferContract.View {
     private ObservableList<Device> devices;
     @FXML
     private TableView<Device> devicesTableView;
@@ -71,12 +75,14 @@ public class MainController implements Initializable, DiscoveryContract.View, Tr
     private TableColumn<Transfer, String> receptionsStatusColumn;
 
     private DiscoveryContract.Presenter discoveryPresenter;
-    private TransferContract.Presenter transferPresenter;
+    private ReceiveTransferContract.Presenter receiveTransferPresenter;
+    private SendTransferContract.Presenter sendTransferPresenter;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         devices = FXCollections.observableArrayList();
         devicesTableView.setItems(devices);
+        devicesTableView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         deviceNameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
         osColumn.setCellValueFactory(new PropertyValueFactory<>("os"));
         ipAddressColumn.setCellValueFactory(new PropertyValueFactory<>("ipAddress"));
@@ -99,8 +105,9 @@ public class MainController implements Initializable, DiscoveryContract.View, Tr
 
         this.discoveryPresenter = new DiscoveryPresenter(this);
         discoveryPresenter.onViewLoaded();
-        this.transferPresenter = new TransferPresenter(this);
-        transferPresenter.onViewLoaded();
+        this.receiveTransferPresenter = new ReceiveTransferPresenter(this);
+        receiveTransferPresenter.onViewLoaded();
+        this.sendTransferPresenter = new SendTransferPresenter(this);
     }
 
     @FXML
@@ -110,12 +117,12 @@ public class MainController implements Initializable, DiscoveryContract.View, Tr
 
     @FXML
     private void browseFileButtonClicked() {
-        transferPresenter.onBrowseFileButtonClicked();
+        sendTransferPresenter.onBrowseFileButtonClicked();
     }
 
     @FXML
     private void sendFileButtonClicked() {
-        transferPresenter.onSendFileButtonClicked();
+        sendTransferPresenter.onSendFileButtonClicked();
     }
 
     @Override
@@ -142,7 +149,7 @@ public class MainController implements Initializable, DiscoveryContract.View, Tr
     public void browseFile() {
         File file = WindowUtils.browseFile();
         if (file != null) {
-            transferPresenter.onFileAttached(file);
+            sendTransferPresenter.onFileAttached(file);
         }
     }
 
@@ -201,7 +208,8 @@ public class MainController implements Initializable, DiscoveryContract.View, Tr
 
     private void onQuit() {
         this.discoveryPresenter.onDestroy();
-        this.transferPresenter.onDestroy();
+        this.receiveTransferPresenter.onDestroy();
+        this.sendTransferPresenter.onDestroy();
     }
 
     private void runOnUiThread(Runnable runnable) {

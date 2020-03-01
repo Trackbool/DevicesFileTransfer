@@ -1,45 +1,21 @@
-package dft.view.transfer;
+package dft.view.transfer.sender;
 
 import dft.model.Device;
-import dft.services.transfer.receiver.FileReceiverProtocol;
-import dft.services.transfer.receiver.FilesReceiverListener;
 import dft.services.transfer.sender.FileSenderProtocol;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 
-public class TransferPresenter implements TransferContract.Presenter {
-    private final static int TRANSFER_SERVICE_PORT = 5001;
-    private TransferContract.View view;
-    private FilesReceiverListener filesReceiverListener;
+public class SendTransferPresenter implements SendTransferContract.Presenter {
+    private SendTransferContract.View view;
     private ThreadPoolExecutor fileSendingExecutor;
-    private ThreadPoolExecutor fileReceivingExecutor;
 
     private File fileToSend;
 
-    public TransferPresenter(TransferContract.View view) {
+    public SendTransferPresenter(SendTransferContract.View view) {
         this.view = view;
         fileSendingExecutor = (ThreadPoolExecutor) Executors.newFixedThreadPool(10);
-        fileReceivingExecutor = (ThreadPoolExecutor) Executors.newFixedThreadPool(10);
-    }
-
-    @Override
-    public void onViewLoaded() {
-        filesReceiverListener = new FilesReceiverListener(TRANSFER_SERVICE_PORT, inputStream -> {
-            FileReceiverProtocol fileReceiver = createFileReceiver();
-            fileReceivingExecutor.execute(() -> fileReceiver.receive(inputStream));
-        });
-
-        new Thread(() -> {
-            try {
-                filesReceiverListener.start();
-            } catch (IOException e) {
-                view.showError("Initialization error", e.getMessage());
-                view.close();
-            }
-        }).start();
     }
 
     @Override
@@ -78,35 +54,6 @@ public class TransferPresenter implements TransferContract.Presenter {
         });
     }
 
-    private FileReceiverProtocol createFileReceiver() {
-        final FileReceiverProtocol fileReceiver = new FileReceiverProtocol(view.getDownloadsDirectory());
-        fileReceiver.setCallback(new FileReceiverProtocol.Callback() {
-            @Override
-            public void onStart() {
-                view.addReceptionTransfer(fileReceiver.getTransfer());
-            }
-
-            @Override
-            public void onFailure(Exception e) {
-                view.refreshReceptionsData();
-                view.showError("Receiving error", e.getMessage());
-            }
-
-            @Override
-            public void onProgressUpdated() {
-                view.refreshReceptionsData();
-            }
-
-            @Override
-            public void onSuccess(File file) {
-                view.refreshReceptionsData();
-                view.showAlert("Receiving success", file.getName());
-            }
-        });
-
-        return fileReceiver;
-    }
-
     private FileSenderProtocol createFileSender(Device device, File file) {
         FileSenderProtocol fileSender = new FileSenderProtocol(device, file);
         fileSender.setCallback(new FileSenderProtocol.Callback() {
@@ -138,9 +85,7 @@ public class TransferPresenter implements TransferContract.Presenter {
 
     @Override
     public void onDestroy() {
-        filesReceiverListener.stop();
         fileSendingExecutor.shutdownNow();
-        fileReceivingExecutor.shutdownNow();
         view = null;
         fileToSend = null;
     }
