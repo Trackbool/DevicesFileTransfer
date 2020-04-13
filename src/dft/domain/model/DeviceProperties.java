@@ -1,6 +1,8 @@
-package dft.model;
+package dft.domain.model;
 
-public class DeviceProperties {
+import java.io.Serializable;
+
+public class DeviceProperties implements Serializable {
     private String name;
     private String os;
 

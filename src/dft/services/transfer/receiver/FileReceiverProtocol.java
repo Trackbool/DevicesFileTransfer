@@ -1,8 +1,9 @@
 package dft.services.transfer.receiver;
 
 import com.google.gson.Gson;
-import dft.model.Device;
-import dft.model.Transfer;
+import dft.domain.model.Device;
+import dft.domain.model.Transfer;
+import dft.util.file.FileUtils;
 
 import java.io.DataInputStream;
 import java.io.File;
@@ -48,19 +49,30 @@ public class FileReceiverProtocol {
     }
 
     public void receive(InputStream inputStream) {
-        try {
-            DataInputStream dataInputStream = new DataInputStream(inputStream);
+        try (DataInputStream dataInputStream = new DataInputStream(inputStream)) {
             String deviceJson = dataInputStream.readUTF();
             Device device = new Gson().fromJson(deviceJson, Device.class);
-            String fileName = dataInputStream.readUTF();
+            String fileNameWithExtension = dataInputStream.readUTF();
+            String fileName = generateFileName(fileNameWithExtension);
             long fileSize = dataInputStream.readLong();
-            transfer = new Transfer(device, fileName, 0);
+            transfer = new Transfer(device, fileName, 0, true);
 
-            fileReceiver.receive(targetDirectory.getPath() + "/" + fileName, fileSize, inputStream);
+            File file = new File(targetDirectory.getAbsolutePath(), fileName);
+            fileReceiver.receive(file, fileSize, inputStream);
         } catch (IOException e) {
             if (callback != null)
-                callback.onFailure(e);
+                callback.onFailure(transfer, e);
         }
+    }
+
+    private String generateFileName(String fileNameWithExtension) {
+        if (fileNameWithExtension == null || fileNameWithExtension.isEmpty()) {
+            return String.valueOf(System.currentTimeMillis());
+        }
+
+        return FileUtils.getFileNameWithoutExtension(fileNameWithExtension) +
+                "_" + System.currentTimeMillis() + "." +
+                FileUtils.getFileExtension(fileNameWithExtension);
     }
 
     public void cancel() {
@@ -72,37 +84,37 @@ public class FileReceiverProtocol {
             @Override
             public void onStart() {
                 transfer.setStatus(Transfer.TransferStatus.TRANSFERRING);
-                callback.onStart();
+                callback.onStart(transfer);
             }
 
             @Override
             public void onFailure(Exception e) {
                 transfer.setStatus(Transfer.TransferStatus.FAILED);
-                callback.onFailure(e);
+                callback.onFailure(transfer, e);
             }
 
             @Override
             public void onProgressUpdated() {
                 transfer.setProgress(fileReceiver.getReceivedPercentage());
-                callback.onProgressUpdated();
+                callback.onProgressUpdated(transfer);
             }
 
             @Override
             public void onSuccess(File file) {
-                transfer.setStatus(Transfer.TransferStatus.SUCCEEDED);
-                callback.onSuccess(file);
+                transfer.setStatus(Transfer.TransferStatus.COMPLETED);
+                callback.onSuccess(transfer, file);
             }
         };
         return new FileReceiver(fileReceiverCallback);
     }
 
     public interface Callback {
-        void onStart();
+        void onStart(Transfer transfer);
 
-        void onFailure(Exception e);
+        void onFailure(Transfer transfer, Exception e);
 
-        void onProgressUpdated();
+        void onProgressUpdated(Transfer transfer);
 
-        void onSuccess(File file);
+        void onSuccess(Transfer transfer, File file);
     }
 }

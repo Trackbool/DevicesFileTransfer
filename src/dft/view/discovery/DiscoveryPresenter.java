@@ -1,10 +1,11 @@
 package dft.view.discovery;
 
-import dft.model.Device;
-import dft.model.DeviceProperties;
-import dft.services.discovery.*;
+import dft.domain.model.Device;
+import dft.services.discovery.DiscoveryProtocolListener;
+import dft.services.discovery.DiscoveryProtocolListenerFactory;
+import dft.services.discovery.DiscoveryProtocolSender;
+import dft.services.discovery.DiscoveryProtocolSenderFactory;
 
-import java.net.InetAddress;
 import java.net.SocketException;
 
 public class DiscoveryPresenter implements DiscoveryContract.Presenter {
@@ -22,27 +23,30 @@ public class DiscoveryPresenter implements DiscoveryContract.Presenter {
         discoveryListener = DiscoveryProtocolListenerFactory
                 .getDefault(DISCOVERY_SERVICE_PORT, new DiscoveryProtocolListener.Callback() {
                     @Override
-                    public void discoveryRequestReceived(InetAddress senderAddress, int senderPort) {
-                        System.out.println("Received request from: " + senderAddress.getHostAddress());
+                    public void initializationFailure(Exception e) {
+                        view.showError("Discovery error", e.getMessage());
                     }
 
                     @Override
-                    public void discoveryResponseReceived(InetAddress senderAddress, int senderPort, DeviceProperties deviceProperties) {
-                        String deviceName = deviceProperties.getName();
-                        String os = deviceProperties.getOs();
-                        Device device = new Device(deviceName, os, senderAddress);
-
+                    public void discoveryRequestReceived(Device device) {
                         if (!view.getDevicesList().contains(device)) {
                             view.addDevice(device);
                         }
                     }
+
+                    @Override
+                    public void discoveryResponseReceived(Device device) {
+                        if (!view.getDevicesList().contains(device)) {
+                            view.addDevice(device);
+                        }
+                    }
+
+                    @Override
+                    public void discoveryDisconnect(Device device) {
+                        view.getDevicesList().remove(device);
+                    }
                 });
-        try {
-            discoveryListener.start();
-        } catch (SocketException e) {
-            view.showError("Initialization error", e.getMessage());
-            view.close();
-        }
+        discoveryListener.start();
         discoverySender = DiscoveryProtocolSenderFactory.getDefault(DISCOVERY_SERVICE_PORT);
         discoverDevices();
     }
@@ -63,6 +67,10 @@ public class DiscoveryPresenter implements DiscoveryContract.Presenter {
 
     @Override
     public void onDestroy() {
+        try {
+            discoverySender.noticeDisconnect();
+        } catch (SocketException ignored) {
+        }
         discoveryListener.stop();
         view = null;
     }

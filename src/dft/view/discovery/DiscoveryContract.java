@@ -1,6 +1,6 @@
 package dft.view.discovery;
 
-import dft.model.Device;
+import dft.domain.model.Device;
 
 import java.util.List;
 

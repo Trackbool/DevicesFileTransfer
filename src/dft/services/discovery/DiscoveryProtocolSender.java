@@ -1,5 +1,9 @@
 package dft.services.discovery;
 
+import com.google.gson.Gson;
+import dft.domain.model.DeviceFactory;
+import dft.domain.model.DiscoveryOperation;
+
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -19,9 +23,23 @@ public class DiscoveryProtocolSender {
 
     public void discover() throws SocketException {
         socket = new DatagramSocket();
-        new Thread(() -> {
-            broadcastDiscovery();
-            socket.close();
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                broadcastDiscovery();
+                socket.close();
+            }
+        }).start();
+    }
+
+    public void noticeDisconnect() throws SocketException {
+        socket = new DatagramSocket();
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                broadcastDisconnect();
+                socket.close();
+            }
         }).start();
     }
 
@@ -30,12 +48,33 @@ public class DiscoveryProtocolSender {
         for (InetAddress a : addresses) {
             try {
                 sendDiscovery(a);
-            } catch (IOException ignored) {}
+            } catch (IOException ignored) {
+            }
+        }
+    }
+
+    private void broadcastDisconnect() {
+        Set<InetAddress> addresses = network.getIpv4BroadcastAddresses();
+        for (InetAddress a : addresses) {
+            try {
+                sendDisconnect(a);
+            } catch (IOException ignored) {
+            }
         }
     }
 
     private void sendDiscovery(InetAddress address) throws IOException {
-        byte[] sendData = "discovery".getBytes();
+        sendOperation("discovery", address);
+    }
+
+    private void sendDisconnect(InetAddress address) throws IOException {
+        sendOperation("disconnect", address);
+    }
+
+    private void sendOperation(String operation, InetAddress address) throws IOException {
+        DiscoveryOperation discoveryOperation =
+                new DiscoveryOperation(operation, DeviceFactory.getCurrentDeviceProperties());
+        byte[] sendData = new Gson().toJson(discoveryOperation).getBytes();
         DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, address, port);
         socket.send(sendPacket);
     }

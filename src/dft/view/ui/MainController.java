@@ -1,10 +1,12 @@
 package dft.view.ui;
 
-import dft.model.Device;
+import dft.domain.model.Device;
+import dft.domain.model.Transfer;
+import dft.domain.model.TransferFile;
+import dft.framework.TransferFileImpl;
 import dft.util.SystemUtils;
 import dft.view.discovery.DiscoveryContract;
 import dft.view.discovery.DiscoveryPresenter;
-import dft.model.Transfer;
 import dft.view.transfer.receiver.ReceiveTransferContract;
 import dft.view.transfer.receiver.ReceiveTransferPresenter;
 import dft.view.transfer.sender.SendTransferContract;
@@ -149,7 +151,8 @@ public class MainController implements Initializable, DiscoveryContract.View,
     public void browseFile() {
         File file = WindowUtils.browseFile();
         if (file != null) {
-            sendTransferPresenter.onFileAttached(file);
+            TransferFile transferFile = new TransferFileImpl(file);
+            sendTransferPresenter.onFileAttached(transferFile);
         }
     }
 

@@ -1,12 +1,13 @@
 package dft.services.transfer.sender;
 
 import com.google.gson.Gson;
-import dft.model.Device;
-import dft.model.DeviceFactory;
-import dft.model.Transfer;
+import dft.domain.model.Device;
+import dft.domain.model.DeviceFactory;
+import dft.domain.model.Transfer;
+import dft.domain.model.TransferFile;
 
 import java.io.DataOutputStream;
-import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.InetAddress;
@@ -16,19 +17,19 @@ import java.net.Socket;
 public class FileSenderProtocol {
     private static final int SOCKET_PORT = 5001;
     private final Device remoteDevice;
-    private final File file;
+    private final TransferFile file;
     private Callback callback;
     private FileSender fileSender;
     private Transfer transfer;
 
-    public FileSenderProtocol(Device remoteDevice, File file) {
+    public FileSenderProtocol(Device remoteDevice, TransferFile file) {
         this.remoteDevice = remoteDevice;
         this.file = file;
         this.fileSender = new FileSender(file);
-        transfer = new Transfer(remoteDevice, file.getName(), 0);
+        transfer = new Transfer(remoteDevice, file.getName(), 0, false);
     }
 
-    public FileSenderProtocol(Device remoteDevice, File file, Callback callback) {
+    public FileSenderProtocol(Device remoteDevice, TransferFile file, Callback callback) {
         this(remoteDevice, file);
         this.callback = callback;
         this.fileSender = createFileSender(callback);
@@ -52,8 +53,15 @@ public class FileSenderProtocol {
     }
 
     public void send() {
-        try {
-            Socket socket = new Socket();
+        if (!file.exists()) {
+            transfer.setStatus(Transfer.TransferStatus.FAILED);
+            if (callback != null) {
+                callback.onInitializationFailure(transfer,
+                        new FileNotFoundException("File " + file.getPath() + " doesn´t exists"));
+            }
+            return;
+        }
+        try (Socket socket = new Socket()) {
             socket.connect(new InetSocketAddress(remoteDevice.getAddress(), SOCKET_PORT), 3000);
             InetAddress currentDeviceAddress = socket.getLocalAddress();
             OutputStream outputStream = socket.getOutputStream();
@@ -63,7 +71,7 @@ public class FileSenderProtocol {
         } catch (IOException e) {
             if (callback != null) {
                 transfer.setStatus(Transfer.TransferStatus.FAILED);
-                callback.onFailure(e);
+                callback.onInitializationFailure(transfer, e);
             }
         }
     }
@@ -80,42 +88,44 @@ public class FileSenderProtocol {
         fileSender.cancel();
     }
 
-    private FileSender createFileSender(Callback callback) {
+    private FileSender createFileSender(final Callback callback) {
         FileSender.Callback fileSenderCallback = new FileSender.Callback() {
             @Override
             public void onStart() {
                 transfer.setStatus(Transfer.TransferStatus.TRANSFERRING);
-                callback.onStart();
+                callback.onStart(transfer);
             }
 
             @Override
             public void onFailure(Exception e) {
                 transfer.setStatus(Transfer.TransferStatus.FAILED);
-                callback.onFailure(e);
+                callback.onFailure(transfer, e);
             }
 
             @Override
             public void onProgressUpdated() {
                 transfer.setProgress(fileSender.getSentPercentage());
-                callback.onProgressUpdated();
+                callback.onProgressUpdated(transfer);
             }
 
             @Override
-            public void onSuccess(File file) {
-                transfer.setStatus(Transfer.TransferStatus.SUCCEEDED);
-                callback.onSuccess(file);
+            public void onSuccess(TransferFile file) {
+                transfer.setStatus(Transfer.TransferStatus.COMPLETED);
+                callback.onSuccess(transfer, file);
             }
         };
         return new FileSender(file, fileSenderCallback);
     }
 
     public interface Callback {
-        void onStart();
+        void onInitializationFailure(Transfer transfer, Exception e);
 
-        void onFailure(Exception e);
+        void onStart(Transfer transfer);
 
-        void onProgressUpdated();
+        void onFailure(Transfer transfer, Exception e);
 
-        void onSuccess(File file);
+        void onProgressUpdated(Transfer transfer);
+
+        void onSuccess(Transfer transfer, TransferFile file);
     }
 }

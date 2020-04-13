@@ -1,6 +1,8 @@
 package dft.view.transfer.sender;
 
-import dft.model.Device;
+import dft.domain.model.Device;
+import dft.domain.model.Transfer;
+import dft.domain.model.TransferFile;
 import dft.services.transfer.sender.FileSenderProtocol;
 
 import java.io.File;
@@ -11,7 +13,7 @@ public class SendTransferPresenter implements SendTransferContract.Presenter {
     private SendTransferContract.View view;
     private ThreadPoolExecutor fileSendingExecutor;
 
-    private File fileToSend;
+    private TransferFile attachedFile;
 
     public SendTransferPresenter(SendTransferContract.View view) {
         this.view = view;
@@ -24,14 +26,14 @@ public class SendTransferPresenter implements SendTransferContract.Presenter {
     }
 
     @Override
-    public void onFileAttached(File file) {
-        fileToSend = file;
-        view.showFileAttachedName(fileToSend.getName());
+    public void onFileAttached(TransferFile file) {
+        attachedFile = file;
+        view.showFileAttachedName(attachedFile.getName());
     }
 
     @Override
     public void onSendFileButtonClicked() {
-        if (fileToSend == null) {
+        if (attachedFile == null) {
             view.showAlert("No file attached", "You must attach a file");
             return;
         }
@@ -48,33 +50,38 @@ public class SendTransferPresenter implements SendTransferContract.Presenter {
 
     private void sendFile(Device device) {
         fileSendingExecutor.execute(() -> {
-            FileSenderProtocol fileSender = createFileSender(device, fileToSend);
-            view.addSendingTransfer(fileSender.getTransfer());
+            FileSenderProtocol fileSender = createFileSender(device, attachedFile);
             fileSender.send();
         });
     }
 
-    private FileSenderProtocol createFileSender(Device device, File file) {
+    private FileSenderProtocol createFileSender(Device device, TransferFile file) {
         FileSenderProtocol fileSender = new FileSenderProtocol(device, file);
         fileSender.setCallback(new FileSenderProtocol.Callback() {
             @Override
-            public void onStart() {
-                //The transfer is added to the list when button is clicked, not when starts
+            public void onInitializationFailure(Transfer transfer, Exception e) {
+                view.showError("Transfer error", e.getMessage());
             }
 
             @Override
-            public void onFailure(Exception e) {
+            public void onStart(Transfer transfer) {
+                view.refreshSendingData();
+                view.addSendingTransfer(transfer);
+            }
+
+            @Override
+            public void onFailure(Transfer transfer, Exception e) {
                 view.refreshSendingData();
                 view.showError("Sending error", e.getMessage());
             }
 
             @Override
-            public void onProgressUpdated() {
+            public void onProgressUpdated(Transfer transfer) {
                 view.refreshSendingData();
             }
 
             @Override
-            public void onSuccess(File file) {
+            public void onSuccess(Transfer transfer, TransferFile file) {
                 view.refreshSendingData();
                 view.showAlert("Sending success", file.getName());
             }
@@ -87,6 +94,6 @@ public class SendTransferPresenter implements SendTransferContract.Presenter {
     public void onDestroy() {
         fileSendingExecutor.shutdownNow();
         view = null;
-        fileToSend = null;
+        attachedFile = null;
     }
 }

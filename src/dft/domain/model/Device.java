@@ -1,4 +1,4 @@
-package dft.model;
+package dft.domain.model;
 
 import java.net.InetAddress;
 import java.util.Objects;
@@ -8,18 +8,34 @@ public class Device {
     private String os;
     private InetAddress address;
 
+    public Device() {
+        address = InetAddress.getLoopbackAddress();
+    }
+
     public Device(String name, String os, InetAddress address) {
         this.name = name;
         this.os = os;
         this.address = address;
     }
 
+    public void setName(String name) {
+        this.name = name;
+    }
+
     public String getName() {
         return name;
     }
 
+    public void setOs(String os) {
+        this.os = os;
+    }
+
     public String getOs() {
         return os;
+    }
+
+    public void setAddress(InetAddress address) {
+        this.address = address;
     }
 
     public InetAddress getAddress() {

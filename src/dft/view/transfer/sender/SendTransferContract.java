@@ -1,9 +1,8 @@
 package dft.view.transfer.sender;
 
-import dft.model.Device;
-import dft.model.Transfer;
-
-import java.io.File;
+import dft.domain.model.Device;
+import dft.domain.model.Transfer;
+import dft.domain.model.TransferFile;
 
 public interface SendTransferContract {
     interface View {
@@ -27,7 +26,7 @@ public interface SendTransferContract {
     interface Presenter {
         void onBrowseFileButtonClicked();
 
-        void onFileAttached(File file);
+        void onFileAttached(TransferFile file);
 
         void onSendFileButtonClicked();
 

@@ -19,7 +19,7 @@ public class FilesReceiverListener {
     }
 
     public void start() throws IOException {
-        if(listening.get()) throw new IllegalStateException("Listener already listening");
+        if (listening.get()) throw new IllegalStateException("Listener already listening");
 
         serverSocket = new ServerSocket(port);
         listening.set(true);
@@ -28,7 +28,8 @@ public class FilesReceiverListener {
                 Socket socket = serverSocket.accept();
                 try {
                     callback.onTransferReceived(socket.getInputStream());
-                } catch (IOException ignored) {}
+                } catch (IOException ignored) {
+                }
             } catch (IOException ignored) {
             }
         }

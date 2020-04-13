@@ -1,5 +1,6 @@
 package dft.view.transfer.receiver;
 
+import dft.domain.model.Transfer;
 import dft.services.transfer.receiver.FileReceiverProtocol;
 import dft.services.transfer.receiver.FilesReceiverListener;
 
@@ -40,23 +41,23 @@ public class ReceiveTransferPresenter implements ReceiveTransferContract.Present
         final FileReceiverProtocol fileReceiver = new FileReceiverProtocol(view.getDownloadsDirectory());
         fileReceiver.setCallback(new FileReceiverProtocol.Callback() {
             @Override
-            public void onStart() {
-                view.addReceptionTransfer(fileReceiver.getTransfer());
+            public void onStart(Transfer transfer) {
+                view.addReceptionTransfer(transfer);
             }
 
             @Override
-            public void onFailure(Exception e) {
+            public void onFailure(Transfer transfer, Exception e) {
                 view.refreshReceptionsData();
                 view.showError("Receiving error", e.getMessage());
             }
 
             @Override
-            public void onProgressUpdated() {
+            public void onProgressUpdated(Transfer transfer) {
                 view.refreshReceptionsData();
             }
 
             @Override
-            public void onSuccess(File file) {
+            public void onSuccess(Transfer transfer, File file) {
                 view.refreshReceptionsData();
                 view.showAlert("Receiving success", file.getName());
             }

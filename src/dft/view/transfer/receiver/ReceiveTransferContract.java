@@ -1,6 +1,6 @@
 package dft.view.transfer.receiver;
 
-import dft.model.Transfer;
+import dft.domain.model.Transfer;
 
 import java.io.File;
 
