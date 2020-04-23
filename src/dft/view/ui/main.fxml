@@ -57,7 +57,7 @@
                   <Insets left="10.0" right="10.0" />
                </padding>
             </Button>
-            <Label fx:id="labelFileAttached" text="No file attached..." />
+            <Label fx:id="labelFileAttached" maxWidth="400.0" text="No file attached..." />
          </children>
       </HBox>
       <HBox prefHeight="228.0" prefWidth="890.0" spacing="5.0">
