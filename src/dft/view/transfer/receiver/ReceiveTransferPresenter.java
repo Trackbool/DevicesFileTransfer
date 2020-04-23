@@ -41,6 +41,11 @@ public class ReceiveTransferPresenter implements ReceiveTransferContract.Present
         final FileReceiverProtocol fileReceiver = new FileReceiverProtocol(view.getDownloadsDirectory());
         fileReceiver.setCallback(new FileReceiverProtocol.Callback() {
             @Override
+            public void onInitializationFailure() {
+
+            }
+
+            @Override
             public void onStart(Transfer transfer) {
                 view.addReceptionTransfer(transfer);
             }
@@ -59,7 +64,6 @@ public class ReceiveTransferPresenter implements ReceiveTransferContract.Present
             @Override
             public void onSuccess(Transfer transfer, File file) {
                 view.refreshReceptionsData();
-                view.showAlert("Receiving success", file.getName());
             }
         });
 

@@ -4,6 +4,8 @@ import dft.domain.model.Device;
 import dft.domain.model.Transfer;
 import dft.domain.model.TransferFile;
 
+import java.util.List;
+
 public interface SendTransferContract {
     interface View {
         void showError(String title, String message);
@@ -12,7 +14,7 @@ public interface SendTransferContract {
 
         void browseFile();
 
-        void showFileAttachedName(String name);
+        void showFilesAttachedName(List<TransferFile> files);
 
         Device[] getSelectedDevices();
 
@@ -26,7 +28,7 @@ public interface SendTransferContract {
     interface Presenter {
         void onBrowseFileButtonClicked();
 
-        void onFileAttached(TransferFile file);
+        void onFilesAttached(List<TransferFile> files);
 
         void onSendFileButtonClicked();
 

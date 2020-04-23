@@ -3,7 +3,7 @@ package dft.view.ui;
 import dft.domain.model.Device;
 import dft.domain.model.Transfer;
 import dft.domain.model.TransferFile;
-import dft.framework.TransferFileImpl;
+import dft.domain.model.TransferFileFactory;
 import dft.util.SystemUtils;
 import dft.view.discovery.DiscoveryContract;
 import dft.view.discovery.DiscoveryPresenter;
@@ -149,16 +149,26 @@ public class MainController implements Initializable, DiscoveryContract.View,
 
     @Override
     public void browseFile() {
-        File file = WindowUtils.browseFile();
-        if (file != null) {
-            TransferFile transferFile = new TransferFileImpl(file);
-            sendTransferPresenter.onFileAttached(transferFile);
+        List<File> files = WindowUtils.browseFile();
+        if (files != null && !files.isEmpty()) {
+            List<TransferFile> transferFiles = new ArrayList<>();
+            for (File file : files) {
+                TransferFile transferFile = TransferFileFactory.getFromFile(file);
+                transferFiles.add(transferFile);
+            }
+
+            sendTransferPresenter.onFilesAttached(transferFiles);
         }
     }
 
     @Override
-    public void showFileAttachedName(String name) {
-        labelFileAttached.setText(name);
+    public void showFilesAttachedName(List<TransferFile> files) {
+        StringBuilder sb = new StringBuilder();
+        for (TransferFile file : files) {
+            sb.append(file.getName()).append(", ");
+        }
+        String resultText = sb.substring(0, sb.length() - 2);
+        labelFileAttached.setText(resultText);
     }
 
     @Override

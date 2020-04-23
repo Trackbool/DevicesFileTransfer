@@ -48,7 +48,9 @@ public class FileReceiver {
             receivedCount.set(0);
             int received;
             int currentPercentage = 0;
-            while ((received = inputStream.read(buffer, 0, buffer.length)) != -1) {
+
+            while ((received = inputStream.read(buffer, 0, getRemaining())) != -1
+                    && receivedCount.get() < fileSize) {
                 if (!receiving.get() || Thread.interrupted()) return;
                 fileWriter.write(buffer, 0, received);
                 receivedCount.getAndAdd(received);
@@ -56,7 +58,7 @@ public class FileReceiver {
                 int receivedPercentage = getReceivedPercentage();
                 if (callback != null && currentPercentage < receivedPercentage) {
                     currentPercentage = receivedPercentage;
-                    callback.onProgressUpdated();
+                    callback.onProgressUpdated(currentPercentage);
                 }
             }
             if (callback != null) {
@@ -75,6 +77,15 @@ public class FileReceiver {
         }
     }
 
+    private int getRemaining() {
+        long remaining = (fileSize - receivedCount.get());
+        if (remaining > BUFFER_SIZE) {
+            return BUFFER_SIZE;
+        }
+
+        return Math.max((int) remaining, 0);
+    }
+
     public void cancel() {
         receiving.set(false);
     }
@@ -84,8 +95,9 @@ public class FileReceiver {
 
         void onFailure(Exception e);
 
-        void onProgressUpdated();
+        void onProgressUpdated(int percentage);
 
         void onSuccess(File file);
     }
 }
+

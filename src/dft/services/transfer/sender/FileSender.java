@@ -42,13 +42,15 @@ public class FileSender {
         sending.set(true);
         if (callback != null)
             callback.onStart();
-        try (InputStream fileReader = file.getInputStream();
-             DataOutputStream output = new DataOutputStream(outputStream)) {
+        try (InputStream fileReader = file.getInputStream()) {
+            DataOutputStream output = new DataOutputStream(outputStream);
             byte[] buffer = new byte[BUFFER_SIZE];
             sentCount.set(0);
             int sent;
             int currentPercentage = 0;
-            while ((sent = fileReader.read(buffer, 0, buffer.length)) != -1) {
+
+            while ((sent = fileReader.read(buffer, 0, getRemaining())) != -1
+                    && sentCount.get() < file.length()) {
                 if (!sending.get() || Thread.interrupted()) return;
                 output.write(buffer, 0, sent);
                 sentCount.getAndAdd(sent);
@@ -56,7 +58,7 @@ public class FileSender {
                 int sentPercentage = getSentPercentage();
                 if (callback != null && currentPercentage < sentPercentage) {
                     currentPercentage = sentPercentage;
-                    callback.onProgressUpdated();
+                    callback.onProgressUpdated(currentPercentage);
                 }
             }
             if (callback != null) {
@@ -79,12 +81,21 @@ public class FileSender {
         sending.set(false);
     }
 
+    private int getRemaining() {
+        long remaining = (file.length() - sentCount.get());
+        if (remaining > BUFFER_SIZE) {
+            return BUFFER_SIZE;
+        }
+
+        return Math.max((int) remaining, 0);
+    }
+
     public interface Callback {
         void onStart();
 
         void onFailure(Exception e);
 
-        void onProgressUpdated();
+        void onProgressUpdated(int percentage);
 
         void onSuccess(TransferFile file);
     }

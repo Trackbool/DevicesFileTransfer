@@ -1,4 +1,4 @@
-package dft.framework;
+package dft.domain.model;
 
 import dft.domain.model.TransferFile;
 
@@ -7,10 +7,10 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 
-public class TransferFileImpl implements TransferFile {
+public class TransferFileLocal implements TransferFile {
     private final File file;
 
-    public TransferFileImpl(File file) {
+    public TransferFileLocal(File file) {
         this.file = file;
     }
 
