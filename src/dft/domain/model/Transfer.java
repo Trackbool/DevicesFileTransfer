@@ -49,6 +49,10 @@ public class Transfer implements Serializable {
         return file;
     }
 
+    public String getFileName() {
+        return file.getName();
+    }
+
     public void setProgress(int progress) {
         this.progress = progress;
     }
