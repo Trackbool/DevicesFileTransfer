@@ -28,6 +28,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.InetAddress;
 import java.net.URL;
 import java.util.ArrayList;
@@ -102,7 +103,11 @@ public class MainController implements Initializable, DiscoveryContract.View,
             if (event.isPrimaryButtonDown() && event.getClickCount() == 2) {
                 Transfer clickedTransfer = sendingTableView.getSelectionModel().getSelectedItem();
                 String path = clickedTransfer.getFile().getPath();
-                WindowUtils.openFolder(new File(path));
+                try {
+                    WindowUtils.openFolder(new File(path).getParentFile());
+                } catch (IOException e) {
+                    showAlert("Error", "Could not open folder");
+                }
             }
         });
 
@@ -117,7 +122,11 @@ public class MainController implements Initializable, DiscoveryContract.View,
             if (event.isPrimaryButtonDown() && event.getClickCount() == 2) {
                 Transfer clickedTransfer = receptionsTableView.getSelectionModel().getSelectedItem();
                 String path = clickedTransfer.getFile().getPath();
-                WindowUtils.openFolder(new File(path));
+                try {
+                    WindowUtils.openFolder(new File(path).getParentFile());
+                } catch (IOException e) {
+                    showAlert("Error", "Could not open folder");
+                }
             }
         });
 

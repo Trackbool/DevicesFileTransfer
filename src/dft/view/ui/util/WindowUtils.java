@@ -17,9 +17,7 @@ public class WindowUtils {
         return fileChooser.showOpenMultipleDialog(stage);
     }
 
-    public static void openFolder(File folderPath) {
-        try {
-            Desktop.getDesktop().open(folderPath);
-        } catch (IOException ignored) {}
+    public static void openFolder(File folderPath) throws IOException {
+        Desktop.getDesktop().open(folderPath);
     }
 }
