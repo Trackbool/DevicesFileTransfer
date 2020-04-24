@@ -16,6 +16,7 @@ import dft.view.ui.util.WindowUtils;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
@@ -23,6 +24,7 @@ import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 
 import java.io.File;
@@ -96,6 +98,13 @@ public class MainController implements Initializable, DiscoveryContract.View,
         sendingFileNameColumn.setCellValueFactory(new PropertyValueFactory<>("fileName"));
         sendingProgressColumn.setCellValueFactory(new PropertyValueFactory<>("progressPercentage"));
         sendingStatusColumn.setCellValueFactory(new PropertyValueFactory<>("statusValue"));
+        sendingTableView.setOnMousePressed(event -> {
+            if (event.isPrimaryButtonDown() && event.getClickCount() == 2) {
+                Transfer clickedTransfer = sendingTableView.getSelectionModel().getSelectedItem();
+                String path = clickedTransfer.getFile().getPath();
+                WindowUtils.openFolder(new File(path));
+            }
+        });
 
         receptionsTransfers = FXCollections.observableArrayList();
         receptionsTableView.setItems(receptionsTransfers);
@@ -104,6 +113,13 @@ public class MainController implements Initializable, DiscoveryContract.View,
         receptionsFileNameColumn.setCellValueFactory(new PropertyValueFactory<>("fileName"));
         receptionsProgressColumn.setCellValueFactory(new PropertyValueFactory<>("progressPercentage"));
         receptionsStatusColumn.setCellValueFactory(new PropertyValueFactory<>("statusValue"));
+        receptionsTableView.setOnMousePressed(event -> {
+            if (event.isPrimaryButtonDown() && event.getClickCount() == 2) {
+                Transfer clickedTransfer = receptionsTableView.getSelectionModel().getSelectedItem();
+                String path = clickedTransfer.getFile().getPath();
+                WindowUtils.openFolder(new File(path));
+            }
+        });
 
         this.discoveryPresenter = new DiscoveryPresenter(this);
         discoveryPresenter.onViewLoaded();

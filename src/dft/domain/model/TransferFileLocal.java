@@ -1,7 +1,5 @@
 package dft.domain.model;
 
-import dft.domain.model.TransferFile;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
