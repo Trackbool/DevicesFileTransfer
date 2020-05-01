@@ -11,7 +11,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<ScrollPane prefHeight="600.0" prefViewportHeight="600.0" prefViewportWidth="800.0" prefWidth="1113.0" stylesheets="@resources/bootstrap3.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="dft.view.ui.MainController">
+<ScrollPane fx:id="rootLayout" prefHeight="600.0" prefViewportHeight="600.0" prefViewportWidth="800.0" prefWidth="1113.0" stylesheets="@resources/bootstrap3.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="dft.view.ui.MainController">
    <VBox layoutX="250.0" layoutY="-38.0" prefHeight="600.0" prefWidth="1112.0" spacing="5.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
       <padding>
          <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />

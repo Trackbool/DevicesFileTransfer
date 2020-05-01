@@ -16,15 +16,11 @@ import dft.view.ui.util.WindowUtils;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Label;
-import javafx.scene.control.SelectionMode;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.input.MouseEvent;
+import javafx.scene.input.TransferMode;
 import javafx.stage.Stage;
 
 import java.io.File;
@@ -38,6 +34,8 @@ import java.util.ResourceBundle;
 public class MainController implements Initializable, DiscoveryContract.View,
         ReceiveTransferContract.View, SendTransferContract.View {
     private ObservableList<Device> devices;
+    @FXML
+    private ScrollPane rootLayout;
     @FXML
     private TableView<Device> devicesTableView;
     @FXML
@@ -135,6 +133,18 @@ public class MainController implements Initializable, DiscoveryContract.View,
         this.receiveTransferPresenter = new ReceiveTransferPresenter(this);
         receiveTransferPresenter.onViewLoaded();
         this.sendTransferPresenter = new SendTransferPresenter(this);
+
+        rootLayout.setOnDragOver(event -> {
+            if (event.getDragboard().hasFiles()) {
+                event.acceptTransferModes(TransferMode.LINK);
+            }
+            event.consume();
+        });
+        rootLayout.setOnDragDropped(event -> {
+            List<File> files = event.getDragboard().getFiles();
+            attachFiles(files);
+            event.consume();
+        });
     }
 
     @FXML
@@ -176,14 +186,17 @@ public class MainController implements Initializable, DiscoveryContract.View,
     public void browseFile() {
         List<File> files = WindowUtils.browseFile();
         if (files != null && !files.isEmpty()) {
-            List<TransferFile> transferFiles = new ArrayList<>();
-            for (File file : files) {
-                TransferFile transferFile = TransferFileFactory.getFromFile(file);
-                transferFiles.add(transferFile);
-            }
-
-            sendTransferPresenter.onFilesAttached(transferFiles);
+            attachFiles(files);
         }
+    }
+
+    private void attachFiles(List<File> files) {
+        List<TransferFile> transferFiles = new ArrayList<>();
+        for (File file : files) {
+            TransferFile transferFile = TransferFileFactory.getFromFile(file);
+            transferFiles.add(transferFile);
+        }
+        sendTransferPresenter.onFilesAttached(transferFiles);
     }
 
     @Override
